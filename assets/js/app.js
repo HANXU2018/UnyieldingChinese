@@ -1,15 +1,5 @@
 // 人生时间窗口导航系统 - 主应用逻辑
 
-// 引入数据
-const script = document.createElement('script');
-script.src = 'http://127.0.0.1:5500/assets/js/data.js';
-script.type = 'text/javascript';
-script.onload = function() {
-  console.log('📊 窗口数据已加载');
-  initApp();
-};
-document.head.appendChild(script);
-
 // 全局变量
 let currentAge = 30;
 let currentFilter = "all";
@@ -446,6 +436,7 @@ function updateAll() {
   renderRadar();
   renderTimeline();
   renderCards();
+  renderNetwork();
 }
 
 // 初始化应用（数据加载后调用）
@@ -460,9 +451,9 @@ function initApp() {
   // 快捷跳转事件
   document.querySelectorAll('.quick-jump').forEach(jump => {
     jump.addEventListener('click', () => {
-      document.querySelectorAll('.quick-jump').forEach(j => j.classList.remove('active', 'btn-primary'));
-      j.classList.add('active', 'btn-primary');
-      j.classList.remove('btn-ghost');
+      document.querySelectorAll('.quick-jump').forEach(j => { j.classList.remove('active', 'btn-primary'); j.classList.add('btn-ghost'); });
+      jump.classList.add('active', 'btn-primary');
+      jump.classList.remove('btn-ghost');
       currentAge = parseInt(jump.dataset.age);
       ageSlider.value = currentAge;
       ageDisplay.textContent = currentAge;
@@ -504,6 +495,109 @@ function initApp() {
 
   // 初始化渲染
   updateAll();
+  initOnboarding();
 
   console.log('🚀 人生时间窗口导航系统已启动');
+}
+
+// 数据已通过 script 标签加载，直接初始化
+document.addEventListener('DOMContentLoaded', initApp);
+
+// 新手引导
+function initOnboarding() {
+  const steps = [
+    { icon: '👋', title: '欢迎使用人生时间窗口', desc: '40个关键人生窗口，帮你找到每件事的最优时机' },
+    { icon: '🎯', title: '拖动年龄滑块', desc: '调节观测年龄，实时查看不同阶段的窗口状态变化' },
+    { icon: '🕸️', title: '网状图 & 卡片', desc: '点击节点或卡片查看详情，了解每个窗口的行动建议' }
+  ];
+  let step = 0;
+  const mask = document.getElementById('onboardingMask');
+  const icon = document.getElementById('onboardingIcon');
+  const title = document.getElementById('onboardingTitle');
+  const desc = document.getElementById('onboardingDesc');
+  const dots = document.querySelectorAll('.onboarding-dot');
+  const nextBtn = document.getElementById('onboardingNext');
+  const skipBtn = document.getElementById('onboardingSkip');
+
+  function close() { mask.classList.add('hidden'); }
+  function update() {
+    icon.textContent = steps[step].icon;
+    title.textContent = steps[step].title;
+    desc.textContent = steps[step].desc;
+    dots.forEach((d, i) => d.classList.toggle('bg-sky-500', i === step));
+    dots.forEach((d, i) => d.classList.toggle('bg-gray-200', i !== step));
+    nextBtn.textContent = step === steps.length - 1 ? '开始使用' : '下一步';
+  }
+  nextBtn.addEventListener('click', () => { if (step < steps.length - 1) { step++; update(); } else { close(); } });
+  skipBtn.addEventListener('click', close);
+}
+
+// 渲染网状图
+function renderNetwork() {
+  const svg = document.getElementById('networkGraph');
+  if (!svg) return;
+  const W = svg.clientWidth || 800;
+  const H = 420;
+
+  const nodeColors = { gold: '#0ea5e9', warning: '#f59e0b', early: '#eab308', risk: '#ef4444', close: '#9ca3af' };
+  const catColors = { health: '#f43f5e', career: '#8b5cf6', finance: '#10b981', relation: '#ec4899', spirit: '#6366f1', risk: '#f97316' };
+
+  const nodes = windowData.map(w => {
+    const s = getWindowStatus(w, currentAge);
+    return { id: w.id, title: w.title, category: w.category, status: s.status, r: Math.max(6, Math.min(18, w.lockForce / 6)) };
+  });
+
+  // edges: same category
+  const edges = [];
+  for (let i = 0; i < windowData.length; i++) {
+    for (let j = i + 1; j < windowData.length; j++) {
+      if (windowData[i].category === windowData[j].category) {
+        edges.push({ source: windowData[i].id, target: windowData[j].id });
+      }
+    }
+  }
+
+  d3.select(svg).selectAll('*').remove();
+  const s = d3.select(svg).attr('viewBox', '0 0 ' + W + ' ' + H);
+
+  const sim = d3.forceSimulation(nodes)
+    .force('link', d3.forceLink(edges).id(d => d.id).distance(60).strength(0.3))
+    .force('charge', d3.forceManyBody().strength(-80))
+    .force('center', d3.forceCenter(W / 2, H / 2))
+    .force('collision', d3.forceCollide(d => d.r + 4));
+
+  const link = s.append('g').selectAll('line').data(edges).enter().append('line')
+    .attr('stroke', '#e5e7eb').attr('stroke-width', 1).attr('opacity', 0.6);
+
+  const node = s.append('g').selectAll('circle').data(nodes).enter().append('circle')
+    .attr('r', d => d.r)
+    .attr('fill', d => nodeColors[d.status] || '#9ca3af')
+    .attr('stroke', d => catColors[d.category] || '#ccc')
+    .attr('stroke-width', 2)
+    .attr('cursor', 'pointer')
+    .on('click', (e, d) => openModal(d.id))
+    .on('mouseover', function(e, d) {
+      d3.select(this).attr('r', d.r + 3);
+      tooltip.style('opacity', 1).html(d.title).style('left', (e.offsetX + 10) + 'px').style('top', (e.offsetY - 20) + 'px');
+    })
+    .on('mouseout', function(e, d) {
+      d3.select(this).attr('r', d.r);
+      tooltip.style('opacity', 0);
+    })
+    .call(d3.drag()
+      .on('start', (e, d) => { if (!e.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+      .on('drag', (e, d) => { d.fx = e.x; d.fy = e.y; })
+      .on('end', (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }));
+
+  const tooltip = d3.select(svg.parentElement).append('div')
+    .style('position', 'absolute').style('background', 'rgba(0,0,0,0.75)').style('color', '#fff')
+    .style('padding', '4px 8px').style('border-radius', '6px').style('font-size', '12px')
+    .style('pointer-events', 'none').style('opacity', 0).style('z-index', 10);
+
+  sim.on('tick', () => {
+    link.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+        .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+    node.attr('cx', d => Math.max(d.r, Math.min(W - d.r, d.x)))
+        .attr('cy', d => Math.max(d.r, Math.min(H - d.r, d.y)));
+  });
 }
