@@ -111,7 +111,6 @@ function renderTimeline() {
     const status = getWindowStatus(item, currentAge);
     const left = (item.goldStart / totalAge * 100).toFixed(2);
     const width = Math.max(0.5, ((item.goldEnd - item.goldStart) / totalAge * 100)).toFixed(2);
-    const top = Math.random() * 30 + 10;
     const bg = bgColors[status.status] || bgColors.close;
     const bc = borderColors[status.status] || borderColors.close;
     html += '<div class="timeline-window ' + status.status + '"';
