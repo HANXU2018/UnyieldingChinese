@@ -8,23 +8,15 @@
       /* 全局颜色规范 - 贴合产品设计 */
       :root {
         --color-primary: #38b2ac; /* 主色-青绿色（黄金期） */
-        --color-primary-light: rgba(56, 178, 172, 0.1);
         --color-warning: #f59e0b; /* 预警色-橙色（即将关闭） */
-        --color-warning-light: rgba(245, 158, 11, 0.1);
         --color-risk: #ef4444; /* 风险色-红色（已关闭） */
-        --color-risk-light: rgba(239, 68, 68, 0.1);
         --color-early: #eab308; /* 提前风险色-黄色 */
-        --color-early-light: rgba(234, 179, 8, 0.1);
         --color-gray: #6b7280; /* 中性灰色（未开启） */
-        --color-gray-light: rgba(107, 114, 128, 0.1);
         --color-bg: #f9fafb; /* 背景色 */
         --color-card: #ffffff; /* 卡片底色 */
         --color-text: #1f2937; /* 主文本色 */
-        --color-text-light: #9ca3af; /* 次要文本色 */
         --radius: 12px; /* 圆角规范 */
-        --radius-sm: 8px;
         --shadow: 0 2px 8px rgba(0, 0, 0, 0.08); /* 卡片阴影 */
-        --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
       }
 
       * {
@@ -486,941 +478,62 @@
         color: var(--color-primary);
         font-weight: 700;
       }
-
-      /* 用户信息区 */
-      .user-info {
-        background: linear-gradient(135deg, var(--color-primary) 0%, #2d9d97 100%);
-        color: white;
-        padding: 20px 16px;
-        margin-bottom: 12px;
-      }
-
-      .user-info-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 16px;
-      }
-
-      .user-info-header h1 {
-        font-size: 20px;
-        font-weight: 600;
-      }
-
-      .user-info-header .tag {
-        background: rgba(255, 255, 255, 0.2);
-        padding: 4px 12px;
-        border-radius: 12px;
-        font-size: 12px;
-      }
-
-      .user-stats {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 8px;
-        text-align: center;
-      }
-
-      .user-stat {
-        background: rgba(255, 255, 255, 0.15);
-        padding: 10px 4px;
-        border-radius: var(--radius-sm);
-      }
-
-      .user-stat .num {
-        font-size: 20px;
-        font-weight: 700;
-      }
-
-      .user-stat .label {
-        font-size: 10px;
-        opacity: 0.9;
-        margin-top: 2px;
-      }
-
-      /* 维度雷达图区 */
-      .radar-section {
-        background: var(--color-card);
-        padding: 16px;
-        margin: 0 16px 12px 16px;
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-      }
-
-      .radar-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 12px;
-      }
-
-      .radar-header h3 {
-        font-size: 15px;
-        font-weight: 600;
-      }
-
-      .radar-grid {
-        display: grid;
-        grid-template-columns: repeat(6, 1fr);
-        gap: 8px;
-      }
-
-      .radar-item {
-        text-align: center;
-      }
-
-      .radar-bar-container {
-        height: 80px;
-        display: flex;
-        align-items: flex-end;
-        justify-content: center;
-        margin-bottom: 8px;
-      }
-
-      .radar-bar {
-        width: 20px;
-        background: var(--color-primary);
-        border-radius: 4px 4px 0 0;
-        transition: height 0.3s ease;
-        min-height: 10px;
-      }
-
-      .radar-item .label {
-        font-size: 10px;
-        color: var(--color-gray);
-      }
-
-      .radar-item .percent {
-        font-size: 11px;
-        font-weight: 600;
-        color: var(--color-primary);
-      }
-
-      /* 全景时间轴 */
-      .timeline-section {
-        background: var(--color-card);
-        padding: 16px;
-        margin: 0 16px 12px 16px;
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-      }
-
-      .timeline-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 12px;
-      }
-
-      .timeline-header h3 {
-        font-size: 15px;
-        font-weight: 600;
-      }
-
-      .timeline-legend {
-        display: flex;
-        gap: 12px;
-        font-size: 11px;
-      }
-
-      .legend-item {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-      }
-
-      .legend-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-      }
-
-      .timeline-container {
-        position: relative;
-        height: 100px;
-        overflow-x: auto;
-        margin: 12px 0;
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-      }
-
-      .timeline-container::-webkit-scrollbar {
-        display: none;
-      }
-
-      .timeline-track {
-        position: relative;
-        height: 60px;
-        background: #e5e7eb;
-        border-radius: 4px;
-        min-width: 100%;
-      }
-
-      .timeline-window {
-        position: absolute;
-        height: 100%;
-        background: var(--color-primary-light);
-        border: 2px solid var(--color-primary);
-        border-radius: 4px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-      }
-
-      .timeline-window:hover {
-        transform: scaleY(1.1);
-        z-index: 10;
-      }
-
-      .timeline-window.gold {
-        background: var(--color-primary-light);
-        border-color: var(--color-primary);
-      }
-
-      .timeline-window.warning {
-        background: var(--color-warning-light);
-        border-color: var(--color-warning);
-      }
-
-      .timeline-window.early {
-        background: var(--color-early-light);
-        border-color: var(--color-early);
-      }
-
-      .timeline-window.risk {
-        background: var(--color-risk-light);
-        border-color: var(--color-risk);
-      }
-
-      .timeline-cursor {
-        position: absolute;
-        top: -5px;
-        width: 2px;
-        height: 70px;
-        background: var(--color-primary);
-        z-index: 20;
-        cursor: ew-resize;
-      }
-
-      .timeline-cursor::after {
-        content: '';
-        position: absolute;
-        top: -8px;
-        left: -4px;
-        width: 10px;
-        height: 10px;
-        background: var(--color-primary);
-        border-radius: 50%;
-        cursor: ew-resize;
-      }
-
-      .timeline-labels {
-        display: flex;
-        justify-content: space-between;
-        font-size: 11px;
-        color: var(--color-gray);
-        margin-top: 8px;
-      }
-
-      /* 优化的滑块样式 */
-      .slider-section {
-        padding: 20px 16px;
-        background: var(--color-card);
-        margin: 0 16px 12px 16px;
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-      }
-
-      .slider-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 16px;
-      }
-
-      .slider-title h2 {
-        font-size: 16px;
-        font-weight: 600;
-        margin-bottom: 2px;
-      }
-
-      .slider-subtitle {
-        font-size: 12px;
-        color: var(--color-text-light);
-      }
-
-      .age-display {
-        font-size: 32px;
-        font-weight: 700;
-        color: var(--color-primary);
-      }
-
-      .age-display .unit {
-        font-size: 14px;
-        font-weight: 500;
-      }
-
-      .quick-jumps {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 16px;
-        flex-wrap: wrap;
-      }
-
-      .quick-jump {
-        padding: 6px 12px;
-        border-radius: 16px;
-        background: #f3f4f6;
-        border: 1px solid #e5e7eb;
-        font-size: 12px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-      }
-
-      .quick-jump:hover {
-        background: var(--color-primary);
-        color: white;
-        border-color: var(--color-primary);
-      }
-
-      .quick-jump.active {
-        background: var(--color-primary);
-        color: white;
-        border-color: var(--color-primary);
-      }
-
-      /* 增强的筛选栏 */
-      .filter-section {
-        background: var(--color-card);
-        padding: 12px 16px;
-        margin: 0 16px 12px 16px;
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-      }
-
-      .filter-group {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-      }
-
-      .filter-divider {
-        width: 1px;
-        background: #e5e7eb;
-        margin: 0 8px;
-      }
-
-      .filter-btn {
-        padding: 6px 14px;
-        border-radius: 16px;
-        background: #f3f4f6;
-        border: 1px solid #e5e7eb;
-        font-size: 12px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        white-space: nowrap;
-      }
-
-      .filter-btn:hover {
-        background: #e5e7eb;
-      }
-
-      .filter-btn.active {
-        background: var(--color-primary);
-        color: white;
-        border-color: var(--color-primary);
-      }
-
-      .filter-btn.gold { border-color: var(--color-primary); color: var(--color-primary); background: white; }
-      .filter-btn.gold.active { background: var(--color-primary); color: white; }
-
-      .filter-btn.warning { border-color: var(--color-warning); color: var(--color-warning); background: white; }
-      .filter-btn.warning.active { background: var(--color-warning); color: white; }
-
-      .filter-btn.early { border-color: var(--color-early); color: var(--color-early); background: white; }
-      .filter-btn.early.active { background: var(--color-early); color: white; }
-
-      .filter-btn.close { border-color: var(--color-risk); color: var(--color-risk); background: white; }
-      .filter-btn.close.active { background: var(--color-risk); color: white; }
-
-      /* 优化的卡片网格 */
-      .card-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-        padding: 0 16px;
-      }
-
-      /* 适配PC端 */
-      @media (min-width: 768px) {
-        .card-grid {
-          grid-template-columns: repeat(3, 1fr);
-        }
-      }
-
-      @media (min-width: 1200px) {
-        .card-grid {
-          grid-template-columns: repeat(4, 1fr);
-          max-width: 1400px;
-          margin: 0 auto;
-        }
-      }
-
-      /* 优化的窗口卡片样式 */
-      .window-card {
-        background: var(--color-card);
-        border-radius: var(--radius);
-        padding: 16px;
-        box-shadow: var(--shadow);
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        border: 2px solid transparent;
-      }
-
-      .window-card:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-lg);
-      }
-
-      .window-card.gold { border-color: var(--color-primary); }
-      .window-card.warning { border-color: var(--color-warning); }
-      .window-card.early { border-color: var(--color-early); }
-      .window-card.risk { border-color: var(--color-risk); }
-      .window-card.close { border-color: var(--color-gray); }
-
-      .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 8px;
-      }
-
-      .card-status {
-        padding: 4px 10px;
-        border-radius: 12px;
-        font-size: 11px;
-        font-weight: 600;
-        white-space: nowrap;
-      }
-
-      .card-status.gold { background: var(--color-primary-light); color: var(--color-primary); }
-      .card-status.warning { background: var(--color-warning-light); color: var(--color-warning); }
-      .card-status.early { background: var(--color-early-light); color: var(--color-early); }
-      .card-status.risk { background: var(--color-risk-light); color: var(--color-risk); }
-      .card-status.close { background: var(--color-gray-light); color: var(--color-gray); }
-
-      .card-icon {
-        font-size: 20px;
-      }
-
-      .card-title {
-        font-size: 15px;
-        font-weight: 600;
-        margin-bottom: 6px;
-        line-height: 1.4;
-        color: var(--color-text);
-      }
-
-      .card-desc {
-        font-size: 13px;
-        color: var(--color-text-light);
-        margin-bottom: 12px;
-        flex-grow: 1;
-        line-height: 1.5;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-      }
-
-      .card-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-top: 10px;
-        border-top: 1px solid #f3f4f6;
-      }
-
-      .card-meta {
-        display: flex;
-        gap: 12px;
-        font-size: 11px;
-        color: var(--color-text-light);
-      }
-
-      .card-meta-item {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-      }
-
-      .card-meta-item .icon { font-size: 12px; }
-      .card-meta-item .value { font-weight: 600; color: var(--color-text); }
-
-      .card-cta {
-        font-size: 11px;
-        color: var(--color-primary);
-        font-weight: 600;
-      }
-
-      /* 详情弹窗优化 */
-      .modal-mask {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 1000;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-      }
-
-      .modal-mask.show {
-        display: flex;
-      }
-
-      .modal-content {
-        background: var(--color-card);
-        border-radius: var(--radius);
-        max-width: 500px;
-        width: 100%;
-        max-height: 85vh;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        animation: modalShow 0.3s ease;
-      }
-
-      @keyframes modalShow {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      .modal-header {
-        padding: 20px 20px 16px 20px;
-        border-bottom: 1px solid #f3f4f6;
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-      }
-
-      .modal-title {
-        flex: 1;
-        padding-right: 12px;
-      }
-
-      .modal-title h2 {
-        font-size: 18px;
-        font-weight: 600;
-        margin-bottom: 6px;
-        line-height: 1.4;
-      }
-
-      .modal-title .status {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 12px;
-        font-size: 11px;
-        font-weight: 600;
-        margin-bottom: 8px;
-      }
-
-      .close-btn {
-        background: none;
-        border: none;
-        font-size: 24px;
-        color: var(--color-gray);
-        cursor: pointer;
-        line-height: 1;
-        padding: 4px;
-      }
-
-      .close-btn:hover {
-        color: var(--color-text);
-      }
-
-      /* 标签页 */
-      .modal-tabs {
-        display: flex;
-        border-bottom: 1px solid #f3f4f6;
-        background: #f9fafb;
-      }
-
-      .modal-tab {
-        flex: 1;
-        padding: 14px 20px;
-        text-align: center;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        color: var(--color-text-light);
-        border: none;
-        background: none;
-        position: relative;
-      }
-
-      .modal-tab:hover {
-        color: var(--color-text);
-      }
-
-      .modal-tab.active {
-        color: var(--color-primary);
-        background: white;
-      }
-
-      .modal-tab.active::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background: var(--color-primary);
-      }
-
-      .modal-body {
-        padding: 20px;
-        overflow-y: auto;
-        flex: 1;
-      }
-
-      .modal-section {
-        display: none;
-      }
-
-      .modal-section.active {
-        display: block;
-      }
-
-      /* 时间轴详情 */
-      .timeline-detail {
-        background: #f3f4f6;
-        border-radius: var(--radius-sm);
-        padding: 16px;
-        margin-bottom: 16px;
-      }
-
-      .timeline-detail h4 {
-        font-size: 14px;
-        font-weight: 600;
-        margin-bottom: 12px;
-        color: var(--color-text);
-      }
-
-      .timeline-visual {
-        position: relative;
-        height: 50px;
-        background: #e5e7eb;
-        border-radius: 4px;
-        margin-bottom: 12px;
-      }
-
-      .timeline-visual .bar {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        height: 20px;
-        background: var(--color-primary);
-        border-radius: 4px;
-      }
-
-      .timeline-info {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-        font-size: 12px;
-        color: var(--color-text-light);
-      }
-
-      .timeline-info-item {
-        text-align: center;
-        padding: 8px;
-        background: white;
-        border-radius: 6px;
-      }
-
-      .timeline-info-item .label {
-        font-size: 10px;
-        margin-bottom: 2px;
-      }
-
-      .timeline-info-item .value {
-        font-weight: 600;
-        color: var(--color-text);
-      }
-
-      /* 代价详情 */
-      .cost-detail {
-        margin-bottom: 16px;
-      }
-
-      .cost-detail h4 {
-        font-size: 14px;
-        font-weight: 600;
-        margin-bottom: 12px;
-        color: var(--color-text);
-      }
-
-      .cost-cards {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-      }
-
-      .cost-card-detail {
-        padding: 14px;
-        border-radius: var(--radius-sm);
-        background: #f3f4f6;
-      }
-
-      .cost-card-detail h5 {
-        font-size: 12px;
-        font-weight: 600;
-        margin-bottom: 8px;
-        color: var(--color-text);
-      }
-
-      .cost-level {
-        font-size: 18px;
-        font-weight: 700;
-        margin-bottom: 4px;
-      }
-
-      .cost-desc {
-        font-size: 12px;
-        color: var(--color-text-light);
-        line-height: 1.4;
-      }
-
-      /* 行动建议 */
-      .action-detail {
-        margin-bottom: 16px;
-      }
-
-      .action-detail h4 {
-        font-size: 14px;
-        font-weight: 600;
-        margin-bottom: 12px;
-        color: var(--color-text);
-      }
-
-      .action-list-detail {
-        list-style: none;
-      }
-
-      .action-list-detail li {
-        padding: 10px 0;
-        font-size: 14px;
-        border-bottom: 1px solid #f3f4f6;
-        padding-left: 24px;
-        position: relative;
-        line-height: 1.5;
-      }
-
-      .action-list-detail li:last-child {
-        border-bottom: none;
-      }
-
-      .action-list-detail li::before {
-        content: "✓";
-        position: absolute;
-        left: 0;
-        color: var(--color-primary);
-        font-weight: 700;
-        font-size: 16px;
-      }
-
-      /* 科学依据 */
-      .source-detail {
-        background: #f0fdf4;
-        border-left: 3px solid var(--color-primary);
-        padding: 12px 14px;
-        border-radius: 6px;
-        font-size: 12px;
-        line-height: 1.6;
-        color: var(--color-text);
-      }
-
-      .source-detail h4 {
-        font-weight: 600;
-        margin-bottom: 4px;
-      }
-
-      /* 适配移动端 */
-      @media (max-width: 480px) {
-        .user-info-header h1 {
-          font-size: 18px;
-        }
-
-        .user-stat .num {
-          font-size: 16px;
-        }
-
-        .radar-grid {
-          grid-template-columns: repeat(3, 1fr);
-          gap: 12px;
-        }
-
-        .radar-bar-container {
-          height: 60px;
-        }
-
-        .age-display {
-          font-size: 28px;
-        }
-
-        .filter-section {
-          padding: 10px 12px;
-        }
-
-        .modal-content {
-          max-height: 90vh;
-        }
-
-        .modal-body {
-          padding: 16px;
-        }
-      }
     </style>
   </head>
   <body>
-    <!-- 用户信息区 -->
-    <div class="user-info">
-      <div class="user-info-header">
-        <h1>人生时间窗口导航系统</h1>
-        <span class="tag">人生没有标准答案，但有最优时机</span>
+    <!-- 顶部导航 -->
+    <div class="header">
+      <h1>人生时间窗口导航系统</h1>
+      <p>人生没有标准答案，但有最优时机</p>
+    </div>
+
+    <!-- 年龄滑块区域 -->
+    <div class="slider-section">
+      <div class="slider-title">
+        <h2>调节观测年龄锚点</h2>
+        <div class="age-display" id="ageDisplay">25岁</div>
       </div>
-      <div class="user-stats">
-        <div class="user-stat">
+      <input
+        type="range"
+        min="0"
+        max="80"
+        value="25"
+        class="age-slider"
+        id="ageSlider"
+      />
+      <div class="age-range">
+        <span>0岁</span>
+        <span>80岁</span>
+      </div>
+      <div class="status-overview" id="statusOverview">
+        <div class="status-item">
           <div class="num" id="goldNum">0</div>
           <div class="label">黄金期</div>
         </div>
-        <div class="user-stat">
+        <div class="status-item">
           <div class="num" id="warningNum">0</div>
           <div class="label">即将关闭</div>
         </div>
-        <div class="user-stat">
+        <div class="status-item">
           <div class="num" id="earlyNum">0</div>
           <div class="label">提前风险</div>
         </div>
-        <div class="user-stat">
+        <div class="status-item">
           <div class="num" id="closeNum">0</div>
           <div class="label">已关闭</div>
         </div>
       </div>
     </div>
 
-    <!-- 维度雷达图区 -->
-    <div class="radar-section">
-      <div class="radar-header">
-        <h3>人生维度完成度</h3>
-        <span style="font-size: 12px; color: var(--color-gray);" id="lifeStage">人生阶段：职场新人期</span>
-      </div>
-      <div class="radar-grid" id="radarGrid">
-        <!-- 动态生成 -->
-      </div>
-    </div>
-
-    <!-- 年龄滑块区域 -->
-    <div class="slider-section">
-      <div class="slider-header">
-        <div class="slider-title">
-          <h2>调节观测年龄锚点</h2>
-          <div class="slider-subtitle">拖动滑块查看不同年龄的窗口状态</div>
-        </div>
-        <div class="age-display"><span id="ageDisplay">25</span><span class="unit">岁</span></div>
-      </div>
-      <div class="quick-jumps">
-        <div class="quick-jump" data-age="0">0岁</div>
-        <div class="quick-jump" data-age="18">18岁</div>
-        <div class="quick-jump" data-age="25">25岁</div>
-        <div class="quick-jump active" data-age="30">30岁</div>
-        <div class="quick-jump" data-age="40">40岁</div>
-        <div class="quick-jump" data-age="50">50岁</div>
-        <div class="quick-jump" data-age="60">60岁</div>
-      </div>
-      <input
-        type="range"
-        min="0"
-        max="80"
-        value="30"
-        class="age-slider"
-        id="ageSlider"
-      />
-      <div class="age-range">
-        <span>0岁</span>
-        <span>40岁</span>
-        <span>80岁</span>
-      </div>
-    </div>
-
-    <!-- 全景时间轴 -->
-    <div class="timeline-section">
-      <div class="timeline-header">
-        <h3>全景时间轴</h3>
-        <div class="timeline-legend">
-          <div class="legend-item">
-            <div class="legend-dot" style="background: var(--color-primary);"></div>
-            <span>黄金期</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-dot" style="background: var(--color-warning);"></div>
-            <span>即将关闭</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-dot" style="background: var(--color-early);"></div>
-            <span>提前风险</span>
-          </div>
-        </div>
-      </div>
-      <div class="timeline-container" id="timelineContainer">
-        <div class="timeline-track" id="timelineTrack">
-          <!-- 动态生成时间轴窗口 -->
-        </div>
-        <div class="timeline-cursor" id="timelineCursor"></div>
-      </div>
-      <div class="timeline-labels">
-        <span>0岁</span>
-        <span>20岁</span>
-        <span>40岁</span>
-        <span>60岁</span>
-        <span>80岁</span>
-      </div>
-    </div>
-
     <!-- 筛选栏 -->
     <div class="filter-section">
-      <div class="filter-group">
-        <div class="filter-btn active" data-filter="all">全部</div>
-        <div class="filter-btn" data-filter="health">生理健康</div>
-        <div class="filter-btn" data-filter="career">学业职业</div>
-        <div class="filter-btn" data-filter="finance">财富资产</div>
-        <div class="filter-btn" data-filter="relation">亲密家庭</div>
-        <div class="filter-btn" data-filter="spirit">精神成长</div>
-        <div class="filter-btn" data-filter="risk">风险兜底</div>
-      </div>
-      <div class="filter-divider"></div>
-      <div class="filter-group">
-        <div class="filter-btn gold" data-status="gold">仅黄金期</div>
-        <div class="filter-btn warning" data-status="warning">预警</div>
-        <div class="filter-btn early" data-status="early">提前</div>
-        <div class="filter-btn close" data-status="close">已关闭</div>
-      </div>
+      <div class="filter-btn active" data-filter="all">全部</div>
+      <div class="filter-btn" data-filter="health">生理健康</div>
+      <div class="filter-btn" data-filter="career">学业职业</div>
+      <div class="filter-btn" data-filter="finance">财富资产</div>
+      <div class="filter-btn" data-filter="relation">亲密家庭</div>
+      <div class="filter-btn" data-filter="spirit">精神成长</div>
+      <div class="filter-btn" data-filter="risk">风险兜底</div>
     </div>
 
     <!-- 卡片网格 -->
@@ -2428,9 +1541,8 @@
       ];
 
       // 全局变量
-      let currentAge = 30;
+      let currentAge = 25;
       let currentFilter = "all";
-      let currentStatusFilter = "all";
 
       // DOM元素
       const ageSlider = document.getElementById("ageSlider");
@@ -2438,14 +1550,11 @@
       const cardGrid = document.getElementById("cardGrid");
       const modalMask = document.getElementById("modalMask");
       const modalContent = document.getElementById("modalContent");
+      const filterBtns = document.querySelectorAll(".filter-btn");
       const goldNum = document.getElementById("goldNum");
       const warningNum = document.getElementById("warningNum");
       const closeNum = document.getElementById("closeNum");
       const earlyNum = document.getElementById("earlyNum");
-      const radarGrid = document.getElementById("radarGrid");
-      const timelineTrack = document.getElementById("timelineTrack");
-      const timelineCursor = document.getElementById("timelineCursor");
-      const lifeStage = document.getElementById("lifeStage");
 
       // 计算窗口状态
       function getWindowStatus(windowItem, age) {
@@ -2484,115 +1593,13 @@
         return { Low: '低', Medium: '中', High: '高', Extreme: '极高' }[level] || level;
       }
 
-      // 获取人生阶段
-      function getLifeStage(age) {
-        if (age < 6) return '幼儿期';
-        if (age < 12) return '童年期';
-        if (age < 18) return '青春期';
-        if (age < 22) return '学生期';
-        if (age < 28) return '职场新人期';
-        if (age < 35) return '成家立业期';
-        if (age < 45) return '中年稳定期';
-        if (age < 55) return '中年转型期';
-        if (age < 65) return '退休预备期';
-        return '退休期';
-      }
-
-      // 渲染维度雷达图
-      function renderRadar() {
-        const dimensions = [
-          { key: 'health', name: '生理健康', icon: '❤️' },
-          { key: 'career', name: '学业职业', icon: '📚' },
-          { key: 'finance', name: '财富资产', icon: '💰' },
-          { key: 'relation', name: '亲密家庭', icon: '👨‍👩‍👧' },
-          { key: 'spirit', name: '精神成长', icon: '🧠' },
-          { key: 'risk', name: '风险兜底', icon: '🛡️' }
-        ];
-
-        let html = '';
-        dimensions.forEach(dim => {
-          const windows = windowData.filter(w => w.category === dim.key);
-          let completed = 0;
-          windows.forEach(w => {
-            const status = getWindowStatus(w, currentAge);
-            if (status.status === 'gold' || status.status === 'close') {
-              completed++;
-            }
-          });
-          const percent = Math.round((completed / windows.length) * 100);
-
-          html += `
-            <div class="radar-item">
-              <div class="radar-bar-container">
-                <div class="radar-bar" style="height: ${percent}%;"></div>
-              </div>
-              <div class="percent">${percent}%</div>
-              <div class="label">${dim.name}</div>
-            </div>
-          `;
-        });
-
-        radarGrid.innerHTML = html;
-        lifeStage.textContent = `人生阶段：${getLifeStage(currentAge)}`;
-      }
-
-      // 渲染全景时间轴
-      function renderTimeline() {
-        const containerWidth = timelineTrack.offsetWidth || 300;
-        const totalAge = 80;
-        const pixelPerAge = containerWidth / totalAge;
-
-        let html = '';
-        windowData.forEach(item => {
-          const status = getWindowStatus(item, currentAge);
-          const left = (item.goldStart * pixelPerAge);
-          const width = ((item.goldEnd - item.goldStart) * pixelPerAge);
-          const top = Math.random() * 30 + 10; // 随机垂直位置
-
-          html += `
-            <div class="timeline-window ${status.status}"
-                 style="left: ${left}px; width: ${width}px; top: ${top}px;"
-                 data-id="${item.id}"
-                 title="${item.title}">
-            </div>
-          `;
-        });
-
-        timelineTrack.innerHTML = html;
-
-        // 更新游标位置
-        const cursorPos = (currentAge / totalAge) * 100;
-        timelineCursor.style.left = `${cursorPos}%`;
-
-        // 绑定时间轴窗口点击事件
-        document.querySelectorAll('.timeline-window').forEach(window => {
-          window.addEventListener('click', () => {
-            const id = window.dataset.id;
-            openModal(id);
-          });
-        });
-      }
-
       // 渲染卡片网格
       function renderCards() {
         let filteredData = windowData;
-
-        // 维度筛选
         if (currentFilter !== "all") {
-          filteredData = filteredData.filter(
+          filteredData = windowData.filter(
             (item) => item.category === currentFilter
           );
-        }
-
-        // 状态筛选
-        if (currentStatusFilter !== "all") {
-          filteredData = filteredData.filter(item => {
-            const status = getWindowStatus(item, currentAge);
-            if (currentStatusFilter === 'warning') {
-              return status.status === 'warning' || status.status === 'risk';
-            }
-            return status.status === currentStatusFilter;
-          });
         }
 
         const statusOrder = { gold: 1, warning: 2, early: 3, risk: 4, close: 5 };
@@ -2602,12 +1609,12 @@
           return (statusOrder[sa] || 9) - (statusOrder[sb] || 9);
         });
 
-        // 统计状态数量（基于全部数据）
+        // 统计状态数量
         let goldCount = 0,
           warningCount = 0,
           earlyCount = 0,
           closeCount = 0;
-        windowData.forEach((item) => {
+        filteredData.forEach((item) => {
           const status = getWindowStatus(item, currentAge);
           if (status.status === "gold") goldCount++;
           if (status.status === "warning" || status.status === "risk")
@@ -2626,38 +1633,27 @@
         let cardHtml = "";
         filteredData.forEach((item) => {
           const status = getWindowStatus(item, currentAge);
-          const categoryIcons = {
-            health: '❤️',
-            career: '💼',
-            finance: '💰',
-            relation: '💕',
-            spirit: '🧠',
-            risk: '🛡️'
-          };
-
           cardHtml += `
-            <div class="window-card ${status.status}" data-id="${item.id}">
-              <div class="card-header">
-                <span class="card-status ${status.status}">${status.label}</span>
-                <span class="card-icon">${categoryIcons[item.category] || '📋'}</span>
-              </div>
-              <h3 class="card-title">${item.title}</h3>
-              <p class="card-desc">${item.desc}</p>
-              <div class="card-footer">
-                <div class="card-meta">
-                  <div class="card-meta-item">
-                    <span class="icon">🔒</span>
-                    <span class="value">${item.lockForce}%</span>
-                  </div>
-                  <div class="card-meta-item">
-                    <span class="icon">⚠️</span>
-                    <span class="value">${costLabel(item.lateCost)}</span>
-                  </div>
-                </div>
-                <div class="card-cta">查看详情 →</div>
-              </div>
-            </div>
-          `;
+                    <div class="window-card" data-id="${item.id}">
+                        <span class="card-status ${status.className}">${status.label}</span>
+                        <h3 class="card-title">${item.title}</h3>
+                        <p class="card-desc">${item.desc}</p>
+                        <div class="card-meta">
+                            <div class="meta-item">
+                                <div class="meta-num">${item.lockForce}%</div>
+                                <div class="meta-label">锁死强制力</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-num">${costLabel(item.earlyCost)}</div>
+                                <div class="meta-label">提前代价</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-num">${costLabel(item.lateCost)}</div>
+                                <div class="meta-label">滞后代价</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
         });
         cardGrid.innerHTML = cardHtml;
 
@@ -2678,8 +1674,8 @@
         // 计算时间轴位置
         const totalAge = Math.max(windowItem.closeAge + 5, 80);
         const goldLeft = (windowItem.goldStart / totalAge) * 100;
-        const goldWidth = ((windowItem.goldEnd - windowItem.goldStart) / totalAge) * 100;
-        const currentLeft = (currentAge / totalAge) * 100;
+        const goldWidth =
+          ((windowItem.goldEnd - windowItem.goldStart) / totalAge) * 100;
 
         // 生成行动列表HTML
         let actionHtml = "";
@@ -2698,123 +1694,65 @@
 
         // 生成弹窗内容
         const modalHtml = `
-          <div class="modal-header">
-            <div class="modal-title">
-              <span class="status ${status.status}">${status.label}</span>
-              <h2>${windowItem.title}</h2>
-            </div>
-            <button class="close-btn" id="closeBtn">×</button>
-          </div>
-
-          <div class="modal-tabs">
-            <button class="modal-tab active" data-tab="overview">概览</button>
-            <button class="modal-tab" data-tab="details">详情</button>
-            <button class="modal-tab" data-tab="actions">行动</button>
-          </div>
-
-          <div class="modal-body">
-            <div class="modal-section active" data-section="overview">
-              ${currentAdvice ? `<div style="background: #ecfdf5; border-left: 3px solid var(--color-primary); padding: 12px 14px; border-radius: 6px; font-size: 14px; line-height: 1.7; margin-bottom: 16px;">${currentAdvice}</div>` : ''}
-
-              <div class="timeline-detail">
-                <h4>时间窗口周期</h4>
-                <div class="timeline-visual">
-                  <div class="bar" style="left: ${goldLeft}%; width: ${goldWidth}%"></div>
-                  <div style="position: absolute; top: 50%; left: ${currentLeft}%; transform: translate(-50%, -50%); width: 3px; height: 30px; background: var(--color-primary);"></div>
+                <div class="modal-header">
+                    <div class="modal-title">
+                        <span class="card-status ${status.className}">${
+          status.label
+        }</span>
+                        <h2>${windowItem.title}</h2>
+                    </div>
+                    <button class="close-btn" id="closeBtn">×</button>
                 </div>
-                <div class="timeline-info">
-                  <div class="timeline-info-item">
-                    <div class="label">开启</div>
-                    <div class="value">${windowItem.goldStart}岁</div>
-                  </div>
-                  <div class="timeline-info-item">
-                    <div class="label">黄金期</div>
-                    <div class="value">${windowItem.goldStart}-${windowItem.goldEnd}岁</div>
-                  </div>
-                  <div class="timeline-info-item">
-                    <div class="label">关闭</div>
-                    <div class="value">${windowItem.closeAge}岁</div>
-                  </div>
+                <p class="modal-desc">${windowItem.desc}</p>
+                ${currentAdvice ? `<div style="background:#f0fdf4;border-left:3px solid #38b2ac;padding:12px 14px;border-radius:6px;font-size:14px;line-height:1.7;margin-bottom:20px;">${currentAdvice}</div>` : ''}
+                
+                <div class="time-axis">
+                    <h3>时间窗口周期</h3>
+                    <div class="axis-line">
+                        <div class="axis-gold" style="left: ${goldLeft}%; width: ${goldWidth}%"></div>
+                        <div class="axis-mark" style="left: ${
+                          (currentAge / totalAge) * 100
+                        }%">当前年龄</div>
+                    </div>
+                    <div class="axis-labels">
+                        <span>开启: ${windowItem.goldStart}岁</span>
+                        <span>黄金期: ${windowItem.goldStart}-${
+          windowItem.goldEnd
+        }岁</span>
+                        <span>关闭: ${windowItem.closeAge}岁</span>
+                    </div>
                 </div>
-              </div>
 
-              <div class="cost-detail">
-                <h4>代价评估</h4>
-                <div class="cost-cards">
-                  <div class="cost-card-detail">
-                    <h5>提前代价</h5>
-                    <div class="cost-level" style="color: var(--color-early)">${costLabel(windowItem.earlyCost)}</div>
-                    <p class="cost-desc">${windowItem.earlyCostDesc}</p>
-                  </div>
-                  <div class="cost-card-detail">
-                    <h5>滞后代价</h5>
-                    <div class="cost-level" style="color: var(--color-risk)">${costLabel(windowItem.lateCost)}</div>
-                    <p class="cost-desc">${windowItem.lateCostDesc}</p>
-                  </div>
+                <div class="cost-section">
+                    <div class="cost-card">
+                        <h4>提前代价</h4>
+                        <div class="cost-level" style="color: var(--color-early)">${costLabel(windowItem.earlyCost)}</div>
+                        <p class="cost-desc">${windowItem.earlyCostDesc}</p>
+                    </div>
+                    <div class="cost-card">
+                        <h4>滞后代价</h4>
+                        <div class="cost-level" style="color: var(--color-risk)">${costLabel(windowItem.lateCost)}</div>
+                        <p class="cost-desc">${windowItem.lateCostDesc}</p>
+                    </div>
                 </div>
-              </div>
 
-              <div class="source-detail">
-                <h4>📚 科学依据</h4>
-                ${windowItem.source}
-              </div>
-            </div>
-
-            <div class="modal-section" data-section="details">
-              <div style="padding: 16px; background: #f9fafb; border-radius: 8px; margin-bottom: 16px;">
-                <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--color-text);">${windowItem.title}</h4>
-                <p style="font-size: 14px; line-height: 1.8; color: var(--color-text-light);">${windowItem.desc}</p>
-              </div>
-
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                <div style="padding: 12px; background: #f3f4f6; border-radius: 8px; text-align: center;">
-                  <div style="font-size: 24px; font-weight: 700; color: var(--color-primary);">${windowItem.lockForce}%</div>
-                  <div style="font-size: 12px; color: var(--color-text-light); margin-top: 4px;">锁死强制力</div>
+                <div class="action-section">
+                    <h3>行动建议</h3>
+                    <ul class="action-list">${actionHtml}</ul>
                 </div>
-                <div style="padding: 12px; background: #f3f4f6; border-radius: 8px; text-align: center;">
-                  <div style="font-size: 24px; font-weight: 700; color: var(--color-warning);">${windowItem.categoryName}</div>
-                  <div style="font-size: 12px; color: var(--color-text-light); margin-top: 4px;">所属维度</div>
+
+                <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #f3f4f6; font-size: 12px; color: var(--color-gray);">
+                    科学依据：${windowItem.source}
                 </div>
-              </div>
-
-              <div style="margin-top: 16px;">
-                <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--color-text);">关键数据</h4>
-                <div style="font-size: 13px; line-height: 2; color: var(--color-text-light);">
-                  <div>• 绝对禁忌提前期：0-${windowItem.earlyRiskEnd}岁</div>
-                  <div>• 提前高代价期：${windowItem.earlyRiskEnd}-${windowItem.goldStart}岁</div>
-                  <div>• 黄金执行期：${windowItem.goldStart}-${windowItem.goldEnd}岁</div>
-                  <div>• 滞后高代价期：${windowItem.goldEnd}-${windowItem.lateRiskEnd}岁</div>
-                  <div>• 绝对不可逆关闭期：${windowItem.closeAge}岁后</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="modal-section" data-section="actions">
-              <div class="action-detail">
-                <h4>📋 行动建议</h4>
-                <ul class="action-list-detail">${actionHtml}</ul>
-              </div>
-
-              ${currentAdvice ? `<div style="background: #fff7ed; border-left: 3px solid var(--color-warning); padding: 12px 14px; border-radius: 6px; font-size: 13px; line-height: 1.7;">${currentAdvice}</div>` : ''}
-            </div>
-          </div>
-        `;
+            `;
 
         modalContent.innerHTML = modalHtml;
         modalMask.classList.add("show");
 
-        // 绑定标签页事件
-        document.querySelectorAll('.modal-tab').forEach(tab => {
-          tab.addEventListener('click', () => {
-            document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.modal-section').forEach(s => s.classList.remove('active'));
-            tab.classList.add('active');
-            document.querySelector(`[data-section="${tab.dataset.tab}"]`).classList.add('active');
-          });
-        });
-
         // 绑定关闭按钮事件
-        document.getElementById("closeBtn").addEventListener("click", closeModal);
+        document
+          .getElementById("closeBtn")
+          .addEventListener("click", closeModal);
       }
 
       // 关闭弹窗
@@ -2832,57 +1770,22 @@
       // 滑块事件绑定
       ageSlider.addEventListener("input", (e) => {
         currentAge = parseInt(e.target.value);
-        ageDisplay.textContent = currentAge;
-        updateAll();
-      });
-
-      // 快捷跳转事件
-      document.querySelectorAll('.quick-jump').forEach(jump => {
-        jump.addEventListener('click', () => {
-          document.querySelectorAll('.quick-jump').forEach(j => j.classList.remove('active'));
-          jump.classList.add('active');
-          currentAge = parseInt(jump.dataset.age);
-          ageSlider.value = currentAge;
-          ageDisplay.textContent = currentAge;
-          updateAll();
-        });
+        ageDisplay.textContent = `${currentAge}岁`;
+        renderCards();
       });
 
       // 筛选按钮事件绑定
-      document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const filterType = btn.dataset.filter;
-          const statusType = btn.dataset.status;
-
-          if (filterType) {
-            // 维度筛选
-            document.querySelectorAll('.filter-btn[data-filter]').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            currentFilter = filterType;
-          } else if (statusType) {
-            // 状态筛选
-            document.querySelectorAll('.filter-btn[data-status]').forEach(b => b.classList.remove('active'));
-            if (currentStatusFilter === statusType) {
-              currentStatusFilter = 'all'; // 取消筛选
-            } else {
-              btn.classList.add('active');
-              currentStatusFilter = statusType;
-            }
-          }
-
+      filterBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          filterBtns.forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          currentFilter = btn.dataset.filter;
           renderCards();
         });
       });
 
-      // 统一更新函数
-      function updateAll() {
-        renderRadar();
-        renderTimeline();
-        renderCards();
-      }
-
       // 初始化渲染
-      updateAll();
+      renderCards();
     </script>
   </body>
 </html>
