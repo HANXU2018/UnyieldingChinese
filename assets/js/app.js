@@ -11,14 +11,12 @@ const modalContent = document.getElementById('modalContent');
 const goldCards = document.getElementById('goldCards');
 const warningCards = document.getElementById('warningCards');
 const earlyCards = document.getElementById('earlyCards');
-const othersCards = document.getElementById('othersCards');
+const closeCards = document.getElementById('closeCards');
 const goldCount = document.getElementById('goldCount');
 const warningCount = document.getElementById('warningCount');
 const earlyCount = document.getElementById('earlyCount');
+const closeCount = document.getElementById('closeCount');
 const radarGrid = document.getElementById('radarGrid');
-const toggleOthersBtn = document.getElementById('toggleOthersBtn');
-const othersSection = document.getElementById('othersSection');
-const toggleIcon = document.getElementById('toggleIcon');
 
 function getWindowStatus(w, age) {
   if (age < w.earlyRiskEnd) return { status: 'early', label: '即将开启', color: 'bg-purple-100 text-purple-700', dot: 'bg-purple-400', border: 'border-purple-400' };
@@ -82,7 +80,7 @@ function renderAllCards() {
     return s.status === 'early';
   }).sort(function(a, b) { return a.goldStart - b.goldStart; });
 
-  const others = windowData.filter(function(w) {
+  const close = windowData.filter(function(w) {
     const s = getWindowStatus(w, currentAge);
     return s.status === 'close';
   }).sort(function(a, b) { return b.lockForce - a.lockForce; });
@@ -90,11 +88,12 @@ function renderAllCards() {
   goldCards.innerHTML = gold.map(renderCard).join('');
   warningCards.innerHTML = warning.map(renderCard).join('');
   earlyCards.innerHTML = early.map(renderCard).join('');
-  othersCards.innerHTML = others.map(renderCard).join('');
+  closeCards.innerHTML = close.map(renderCard).join('');
 
   goldCount.textContent = '(' + gold.length + '个)';
   warningCount.textContent = '(' + warning.length + '个)';
   earlyCount.textContent = '(' + early.length + '个)';
+  closeCount.textContent = '(' + close.length + '个)';
 
   document.querySelectorAll('[data-id]').forEach(function(el) {
     el.addEventListener('click', function() { openModal(el.dataset.id); });
@@ -321,19 +320,6 @@ function initApp() {
       });
       btn.classList.add('ring-2', 'ring-offset-1', 'ring-sky-300');
     });
-  });
-
-  toggleOthersBtn.addEventListener('click', function() {
-    const isHidden = othersSection.classList.contains('hidden');
-    if (isHidden) {
-      othersSection.classList.remove('hidden');
-      toggleIcon.style.transform = 'rotate(180deg)';
-      toggleOthersBtn.querySelector('span').textContent = '收起其他窗口';
-    } else {
-      othersSection.classList.add('hidden');
-      toggleIcon.style.transform = 'rotate(0deg)';
-      toggleOthersBtn.querySelector('span').textContent = '查看其他窗口';
-    }
   });
 
   updateAll();

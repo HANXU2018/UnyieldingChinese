@@ -97,15 +97,14 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="earlyCards"></div>
     </div>
 
-    <!-- 其他状态 - 折叠 -->
-    <div class="mb-8">
-      <button id="toggleOthersBtn" class="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 mb-4">
-        <span>查看其他窗口</span>
-        <svg id="toggleIcon" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-      </button>
-      <div id="othersSection" class="hidden">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="othersCards"></div>
+    <!-- 已关闭 - 错失的窗口 -->
+    <div id="closeSection" class="mb-8">
+      <div class="flex items-center gap-2 mb-4">
+        <div class="w-3 h-3 rounded-full bg-gray-400"></div>
+        <h2 class="text-xl font-bold text-gray-600">已错失的窗口 <span class="text-sm font-normal text-gray-500 ml-2" id="closeCount">(0个)</span></h2>
+        <span class="text-xs text-gray-400 ml-auto">这些窗口已关闭，但值得了解</span>
       </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="closeCards"></div>
     </div>
 
     <!-- 维度概览 -->
