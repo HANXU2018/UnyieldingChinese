@@ -1,4 +1,4 @@
-      const windowData = [
+const windowData = [
         // 维度1：生理与健康底层（10个）
         {
           id: 1,
