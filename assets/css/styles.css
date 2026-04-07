@@ -16,12 +16,18 @@ body {
   overflow: hidden;
 }
 
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* Top sticky age slider */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
-  height: 8px;
-  border-radius: 4px;
+  height: 6px;
+  border-radius: 3px;
   background: #e2e8f0;
   cursor: pointer;
 }
@@ -29,28 +35,28 @@ input[type="range"] {
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: #0ea5e9;
   cursor: grab;
-  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.4);
+  box-shadow: 0 2px 6px rgba(14, 165, 233, 0.4);
   transition: transform 0.15s ease;
 }
 
 input[type="range"]::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.5);
+  transform: scale(1.15);
+  box-shadow: 0 3px 10px rgba(14, 165, 233, 0.5);
 }
 
 input[type="range"]::-webkit-slider-thumb:active {
-  transform: scale(1.1);
+  transform: scale(1.08);
   cursor: grabbing;
 }
 
 input[type="range"]::-moz-range-thumb {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: #0ea5e9;
   cursor: grab;
@@ -63,22 +69,22 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .status-filter-btn:hover {
-  transform: scale(1.05);
+  transform: scale(1.02);
 }
 
 /* Card styles */
 [data-id] {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 [data-id]:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
 /* Section divider */
 h2 {
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
 /* Tab styles */
@@ -89,22 +95,22 @@ h2 {
 
 /* Modal animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 .modal-mask {
-  animation: fadeIn 0.25s ease-out;
+  animation: fadeIn 0.2s ease-out;
 }
 
 .modal-content {
-  animation: fadeIn 0.25s ease-out;
+  animation: fadeIn 0.2s ease-out;
 }
 
 /* Pulse animation for warning indicator */
 @keyframes pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.8; transform: scale(1.05); }
+  50% { opacity: 0.85; transform: scale(1.03); }
 }
 
 .animate-pulse {

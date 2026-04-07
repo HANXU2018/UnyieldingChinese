@@ -51,26 +51,17 @@ function renderCard(w) {
   const catIcons = { health: '❤️', career: '💼', finance: '💰', relation: '💕', spirit: '🧠', risk: '🛡️' };
   const catLabels = { health: '健康', career: '职业', finance: '财富', relation: '家庭', spirit: '成长', risk: '风险' };
 
-  let html = '<div class="bg-white rounded-xl p-5 shadow-sm hover:shadow-lg cursor-pointer border-l-4 ' + s.border + ' transition-all" data-id="' + w.id + '">';
-  html += '<div class="flex items-start justify-between mb-3">';
+  let html = '';
+  html += '<div class="bg-white rounded-xl p-4 shadow-sm hover:shadow-md cursor-pointer border-l-4 ' + s.border + ' transition-all" data-id="' + w.id + '">';
+  html += '<div class="flex items-center justify-between mb-3">';
   html += '<div class="flex items-center gap-2">';
-  html += '<span class="text-2xl">' + (catIcons[w.category] || '📋') + '</span>';
-  html += '<span class="px-2 py-1 rounded-lg text-xs font-medium ' + s.color + '">' + s.label + '</span>';
+  html += '<span class="text-xl">' + (catIcons[w.category] || '📋') + '</span>';
+  html += '<span class="px-2 py-0.5 rounded text-xs font-medium ' + s.color + '">' + s.label + '</span>';
   html += '</div>';
   html += '<span class="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">' + w.goldStart + '-' + w.goldEnd + '岁</span>';
   html += '</div>';
-  html += '<h3 class="text-base font-bold text-gray-800 mb-2">' + w.title + '</h3>';
-  html += '<p class="text-sm text-gray-600 mb-4 line-clamp-2">' + w.desc + '</p>';
-  html += '<div class="space-y-2">';
-  html += '<div class="flex items-center justify-between text-xs text-gray-500">';
-  html += '<span>维度: ' + (catLabels[w.category] || '其他') + '</span>';
-  html += '<span>锁死力: ' + w.lockForce + '%</span>';
-  html += '</div>';
-  html += '<div class="flex items-center justify-between text-xs text-gray-500">';
-  html += '<span>提前代价: ' + costLabel(w.earlyCost) + '</span>';
-  html += '<span>滞后代价: ' + costLabel(w.lateCost) + '</span>';
-  html += '</div>';
-  html += '</div>';
+  html += '<h3 class="text-base font-semibold text-gray-800 mb-2 truncate">' + w.title + '</h3>';
+  html += '<p class="text-sm text-gray-500 line-clamp-2">' + w.desc + '</p>';
   html += '</div>';
   return html;
 }
