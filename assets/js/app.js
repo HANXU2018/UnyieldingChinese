@@ -289,6 +289,20 @@ function updateAll() {
 }
 
 function initApp() {
+  console.log('initApp() called');
+  console.log('DOM elements check:');
+  console.log('ageSlider:', ageSlider);
+  console.log('ageDisplay:', ageDisplay);
+  console.log('goldCards:', goldCards);
+  console.log('warningCards:', warningCards);
+  console.log('earlyCards:', earlyCards);
+  console.log('windowData:', typeof windowData, windowData ? windowData.length : 'undefined');
+
+  if (!ageSlider) {
+    console.error('ageSlider not found!');
+    return;
+  }
+
   ageSlider.addEventListener('input', function(e) {
     currentAge = parseInt(e.target.value);
     ageDisplay.textContent = currentAge;
