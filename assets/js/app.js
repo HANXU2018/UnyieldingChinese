@@ -51,7 +51,7 @@ function renderCard(w) {
   const catIcons = { health: '❤️', career: '💼', finance: '💰', relation: '💕', spirit: '🧠', risk: '🛡️' };
   const catLabels = { health: '健康', career: '职业', finance: '财富', relation: '家庭', spirit: '成长', risk: '风险' };
 
-  const html = '<div class="bg-white rounded-xl p-5 shadow-sm hover:shadow-lg cursor-pointer border-l-4 ' + s.border + ' transition-all" data-id="' + w.id + '">';
+  let html = '<div class="bg-white rounded-xl p-5 shadow-sm hover:shadow-lg cursor-pointer border-l-4 ' + s.border + ' transition-all" data-id="' + w.id + '">';
   html += '<div class="flex items-start justify-between mb-3">';
   html += '<div class="flex items-center gap-2">';
   html += '<span class="text-2xl">' + (catIcons[w.category] || '📋') + '</span>';
