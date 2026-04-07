@@ -14,183 +14,135 @@
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- D3.js for network graph -->
-  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
-
   <!-- Custom CSS -->
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
-<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+<body class="bg-slate-100 min-h-screen">
   <!-- 新手引导弹窗 -->
   <div id="onboardingMask" class="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-sm w-full p-8 shadow-2xl text-center">
-      <div class="text-5xl mb-4" id="onboardingIcon">👋</div>
-      <h2 class="text-xl font-bold text-gray-800 mb-2" id="onboardingTitle">欢迎使用人生时间窗口</h2>
-      <p class="text-gray-500 text-sm mb-6" id="onboardingDesc">40个关键人生窗口，帮你找到每件事的最优时机</p>
-      <div class="flex justify-center gap-2 mb-6">
+    <div class="bg-white rounded-xl max-w-sm w-full p-6 shadow-2xl text-center">
+      <div class="text-4xl mb-3" id="onboardingIcon">👋</div>
+      <h2 class="text-lg font-bold text-gray-800 mb-2" id="onboardingTitle">欢迎使用人生时间窗口</h2>
+      <p class="text-gray-500 text-sm mb-4" id="onboardingDesc">40个关键人生窗口，帮你找到每件事的最优时机</p>
+      <div class="flex justify-center gap-2 mb-4">
         <div class="w-2 h-2 rounded-full bg-sky-500 onboarding-dot" data-step="0"></div>
         <div class="w-2 h-2 rounded-full bg-gray-200 onboarding-dot" data-step="1"></div>
         <div class="w-2 h-2 rounded-full bg-gray-200 onboarding-dot" data-step="2"></div>
       </div>
-      <div class="flex gap-3">
+      <div class="flex gap-2">
         <button id="onboardingSkip" class="btn btn-sm btn-ghost flex-1">跳过</button>
         <button id="onboardingNext" class="btn btn-sm btn-primary flex-1">下一步</button>
       </div>
     </div>
   </div>
-  <!-- 用户信息区 -->
-  <div class="bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow-xl mx-4 mt-4 rounded-2xl p-6 animate-fadeInUp">
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold">人生时间窗口导航系统</h1>
-      <span class="bg-white/20 px-4 py-1 rounded-full text-sm">人生没有标准答案，但有最优时机</span>
-    </div>
-    <div class="grid grid-cols-4 gap-4 text-center">
-      <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-        <div class="text-3xl font-bold" id="goldNum">0</div>
-        <div class="text-xs mt-1 opacity-90">黄金期</div>
-      </div>
-      <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-        <div class="text-3xl font-bold" id="warningNum">0</div>
-        <div class="text-xs mt-1 opacity-90">即将关闭</div>
-      </div>
-      <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-        <div class="text-3xl font-bold" id="earlyNum">0</div>
-        <div class="text-xs mt-1 opacity-90">提前风险</div>
-      </div>
-      <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-        <div class="text-3xl font-bold" id="closeNum">0</div>
-        <div class="text-xs mt-1 opacity-90">已关闭</div>
-      </div>
-    </div>
-  </div>
 
-  <!-- 维度雷达图区 -->
-  <div class="bg-white shadow-lg mx-4 mt-4 rounded-2xl p-6 animate-fadeInUp">
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="text-lg font-semibold text-gray-800">人生维度完成度</h3>
-      <span class="text-sm text-gray-500" id="lifeStage">人生阶段：职场新人期</span>
+  <div class="max-w-7xl mx-auto p-4 space-y-4">
+    <!-- 顶部栏 -->
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <h1 class="text-xl font-bold text-gray-800">人生时间窗口</h1>
+        <span class="text-xs text-gray-500 bg-white px-2 py-1 rounded-full">40个关键节点</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-3xl font-bold text-sky-600" id="ageDisplay">30</span>
+        <span class="text-sm text-gray-600">岁</span>
+      </div>
     </div>
-    <div class="grid grid-cols-6 gap-4" id="radarGrid">
-      <!-- 动态生成 -->
-    </div>
-  </div>
 
-  <!-- 年龄滑块区域 -->
-  <div class="bg-white shadow-lg mx-4 mt-4 rounded-2xl p-6 animate-fadeInUp">
-    <div class="flex justify-between items-center mb-6">
-      <div>
-        <h2 class="text-lg font-semibold text-gray-800 mb-1">调节观测年龄锚点</h2>
-        <div class="text-sm text-gray-500">拖动滑块查看不同年龄的窗口状态</div>
+    <!-- 年龄滑块 -->
+    <div class="bg-white rounded-xl p-4 shadow-sm">
+      <div class="flex gap-2 mb-3">
+        <button class="btn btn-xs btn-ghost quick-jump" data-age="0">0</button>
+        <button class="btn btn-xs btn-ghost quick-jump" data-age="18">18</button>
+        <button class="btn btn-xs btn-ghost quick-jump" data-age="25">25</button>
+        <button class="btn btn-xs btn-primary quick-jump" data-age="30">30</button>
+        <button class="btn btn-xs btn-ghost quick-jump" data-age="40">40</button>
+        <button class="btn btn-xs btn-ghost quick-jump" data-age="50">50</button>
+        <button class="btn btn-xs btn-ghost quick-jump" data-age="60">60</button>
       </div>
-      <div class="text-4xl font-bold bg-gradient-to-r from-sky-500 to-indigo-600 bg-clip-text text-transparent">
-        <span id="ageDisplay">30</span><span class="text-lg font-medium">岁</span>
-      </div>
+      <input type="range" min="0" max="80" value="30" class="w-full" id="ageSlider" />
     </div>
-    <div class="flex gap-3 mb-6 flex-wrap">
-      <button class="btn btn-sm btn-ghost bg-gray-100 hover:bg-sky-500 hover:text-white transition-all duration-200 quick-jump" data-age="0">0岁</button>
-      <button class="btn btn-sm btn-ghost bg-gray-100 hover:bg-sky-500 hover:text-white transition-all duration-200 quick-jump" data-age="18">18岁</button>
-      <button class="btn btn-sm btn-ghost bg-gray-100 hover:bg-sky-500 hover:text-white transition-all duration-200 quick-jump" data-age="25">25岁</button>
-      <button class="btn btn-sm btn-primary quick-jump active" data-age="30">30岁</button>
-      <button class="btn btn-sm btn-ghost bg-gray-100 hover:bg-sky-500 hover:text-white transition-all duration-200 quick-jump" data-age="40">40岁</button>
-      <button class="btn btn-sm btn-ghost bg-gray-100 hover:bg-sky-500 hover:text-white transition-all duration-200 quick-jump" data-age="50">50岁</button>
-      <button class="btn btn-sm btn-ghost bg-gray-100 hover:bg-sky-500 hover:text-white transition-all duration-200 quick-jump" data-age="60">60岁</button>
-    </div>
-    <input
-      type="range"
-      min="0"
-      max="80"
-      value="30"
-      class="w-full"
-      id="ageSlider"
-    />
-    <div class="flex justify-between text-sm text-gray-500 mt-3">
-      <span>0岁</span>
-      <span>40岁</span>
-      <span>80岁</span>
-    </div>
-  </div>
 
-  <!-- 全景时间轴 -->
-  <div class="bg-white shadow-lg mx-4 mt-4 rounded-2xl p-6 animate-fadeInUp">
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="text-lg font-semibold text-gray-800">全景时间轴</h3>
-      <div class="flex gap-6 text-xs">
-        <div class="flex items-center gap-2">
-          <div class="w-2 h-2 rounded-full bg-sky-500"></div>
-          <span>黄金期</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="w-2 h-2 rounded-full bg-amber-500"></div>
-          <span>即将关闭</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
-          <span>提前风险</span>
-        </div>
+    <!-- 维度进度 -->
+    <div class="bg-white rounded-xl p-4 shadow-sm">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-sm font-semibold text-gray-800">维度完成度</h3>
+        <span class="text-xs text-gray-500" id="lifeStage">职场新人期</span>
       </div>
+      <div class="grid grid-cols-6 gap-2" id="radarGrid"></div>
     </div>
-    <div class="relative h-24 overflow-x-auto mb-3" id="timelineContainer">
-      <div class="relative h-16 bg-gray-200 rounded-lg min-w-full" id="timelineTrack">
-        <!-- 动态生成时间轴窗口 -->
-      </div>
-      <div class="timeline-cursor absolute top-0 w-0.5 h-20 bg-sky-500 z-20" id="timelineCursor"></div>
-    </div>
-    <div class="flex justify-between text-xs text-gray-500">
-      <span>0岁</span>
-      <span>20岁</span>
-      <span>40岁</span>
-      <span>60岁</span>
-      <span>80岁</span>
-    </div>
-  </div>
 
-  <!-- 人生节点网状图 -->
-  <div class="bg-white shadow-lg mx-4 mt-4 rounded-2xl p-6 animate-fadeInUp">
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="text-lg font-semibold text-gray-800">人生节点关系网络</h3>
-      <div class="flex gap-3 text-xs">
-        <div class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-sky-500"></div><span>黄金期</span></div>
-        <div class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-amber-500"></div><span>预警</span></div>
-        <div class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-yellow-400"></div><span>提前</span></div>
-        <div class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-gray-400"></div><span>已关闭</span></div>
+    <!-- 时间轴表格 -->
+    <div class="bg-white rounded-xl p-4 shadow-sm">
+      <h3 class="text-sm font-semibold text-gray-800 mb-3">窗口时间轴</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs">
+          <thead>
+            <tr class="border-b border-gray-200">
+              <th class="text-left py-2 px-2 text-gray-500 font-medium">窗口</th>
+              <th class="text-center py-2 px-1 text-gray-500 font-medium">0</th>
+              <th class="text-center py-2 px-1 text-gray-500 font-medium">20</th>
+              <th class="text-center py-2 px-1 text-gray-500 font-medium">40</th>
+              <th class="text-center py-2 px-1 text-gray-500 font-medium">60</th>
+              <th class="text-center py-2 px-1 text-gray-500 font-medium">80</th>
+              <th class="text-center py-2 px-2 text-gray-500 font-medium">状态</th>
+            </tr>
+          </thead>
+          <tbody id="timelineTable"></tbody>
+        </table>
+      </div>
+      <div class="flex gap-4 mt-2 text-xs text-gray-500">
+        <div class="flex items-center gap-1"><div class="w-2 h-2 rounded bg-sky-500"></div><span>黄金期</span></div>
+        <div class="flex items-center gap-1"><div class="w-2 h-2 rounded bg-amber-500"></div><span>预警</span></div>
+        <div class="flex items-center gap-1"><div class="w-2 h-2 rounded bg-yellow-400"></div><span>提前</span></div>
       </div>
     </div>
-    <div class="text-xs text-gray-400 mb-3">节点大小代表锁死强制力，连线代表同维度关联，点击节点查看详情</div>
-    <svg id="networkGraph" class="w-full rounded-xl bg-gray-50" style="height:420px"></svg>
-  </div>
 
-  <!-- 筛选栏 -->
-  <div class="bg-white shadow-lg mx-4 mt-4 rounded-2xl p-4 animate-fadeInUp">
-    <div class="flex flex-wrap gap-3">
-      <div class="flex gap-2 flex-wrap">
-        <button class="btn btn-sm btn-primary filter-btn" data-filter="all">全部</button>
-        <button class="btn btn-sm btn-ghost filter-btn" data-filter="health">生理健康</button>
-        <button class="btn btn-sm btn-ghost filter-btn" data-filter="career">学业职业</button>
-        <button class="btn btn-sm btn-ghost filter-btn" data-filter="finance">财富资产</button>
-        <button class="btn btn-sm btn-ghost filter-btn" data-filter="relation">亲密家庭</button>
-        <button class="btn btn-sm btn-ghost filter-btn" data-filter="spirit">精神成长</button>
-        <button class="btn btn-sm btn-ghost filter-btn" data-filter="risk">风险兜底</button>
+    <!-- 统计面板 -->
+    <div class="grid grid-cols-4 gap-2">
+      <div class="bg-gradient-to-br from-sky-500 to-sky-600 text-white rounded-lg p-3 text-center">
+        <div class="text-2xl font-bold" id="goldNum">0</div>
+        <div class="text-xs opacity-90">黄金期</div>
       </div>
-      <div class="w-px bg-gray-200"></div>
-      <div class="flex gap-2 flex-wrap">
-        <button class="btn btn-sm btn-outline border-sky-500 text-sky-500 hover:bg-sky-500 hover:text-white filter-btn" data-status="gold">仅黄金期</button>
-        <button class="btn btn-sm btn-outline border-amber-500 text-amber-500 hover:bg-amber-500 hover:text-white filter-btn" data-status="warning">预警</button>
-        <button class="btn btn-sm btn-outline border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-white filter-btn" data-status="early">提前</button>
-        <button class="btn btn-sm btn-outline border-red-500 text-red-500 hover:bg-red-500 hover:text-white filter-btn" data-status="close">已关闭</button>
+      <div class="bg-gradient-to-br from-amber-500 to-amber-600 text-white rounded-lg p-3 text-center">
+        <div class="text-2xl font-bold" id="warningNum">0</div>
+        <div class="text-xs opacity-90">即将关闭</div>
+      </div>
+      <div class="bg-gradient-to-br from-yellow-400 to-yellow-500 text-white rounded-lg p-3 text-center">
+        <div class="text-2xl font-bold" id="earlyNum">0</div>
+        <div class="text-xs opacity-90">提前风险</div>
+      </div>
+      <div class="bg-gradient-to-br from-gray-400 to-gray-500 text-white rounded-lg p-3 text-center">
+        <div class="text-2xl font-bold" id="closeNum">0</div>
+        <div class="text-xs opacity-90">已关闭</div>
       </div>
     </div>
-  </div>
 
-  <!-- 卡片网格 -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mx-4 mt-4 mb-8" id="cardGrid">
-    <!-- 动态生成卡片 -->
+    <!-- 筛选 -->
+    <div class="bg-white rounded-xl p-3 shadow-sm">
+      <div class="flex flex-wrap gap-2">
+        <button class="btn btn-xs btn-primary filter-btn" data-filter="all">全部</button>
+        <button class="btn btn-xs btn-ghost filter-btn" data-filter="health">健康</button>
+        <button class="btn btn-xs btn-ghost filter-btn" data-filter="career">职业</button>
+        <button class="btn btn-xs btn-ghost filter-btn" data-filter="finance">财富</button>
+        <button class="btn btn-xs btn-ghost filter-btn" data-filter="relation">家庭</button>
+        <button class="btn btn-xs btn-ghost filter-btn" data-filter="spirit">成长</button>
+        <button class="btn btn-xs btn-ghost filter-btn" data-filter="risk">风险</button>
+        <div class="w-px bg-gray-200"></div>
+        <button class="btn btn-xs btn-outline border-sky-500 text-sky-500 hover:bg-sky-500 hover:text-white filter-btn" data-status="gold">黄金</button>
+        <button class="btn btn-xs btn-outline border-amber-500 text-amber-500 hover:bg-amber-500 hover:text-white filter-btn" data-status="warning">预警</button>
+        <button class="btn btn-xs btn-outline border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-white filter-btn" data-status="early">提前</button>
+        <button class="btn btn-xs btn-outline border-red-500 text-red-500 hover:bg-red-500 hover:text-white filter-btn" data-status="close">关闭</button>
+      </div>
+    </div>
+
+    <!-- 卡片列表 -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3" id="cardGrid"></div>
   </div>
 
   <!-- 详情弹窗 -->
   <div class="modal-mask fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4" id="modalMask">
-    <div class="modal-content bg-white rounded-2xl max-w-lg w-full max-h-[85vh] overflow-hidden flex flex-col shadow-2xl" id="modalContent">
-      <!-- 弹窗内容由JS动态生成 -->
-    </div>
+    <div class="modal-content bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl" id="modalContent"></div>
   </div>
 
   <!-- 数据 + 主应用 JS -->
