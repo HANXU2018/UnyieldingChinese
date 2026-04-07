@@ -46,37 +46,49 @@ body {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
+/* Top sticky age slider */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
-  height: 6px;
-  border-radius: 3px;
+  height: 8px;
+  border-radius: 4px;
   background: #e2e8f0;
+  cursor: pointer;
 }
 
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: #0ea5e9;
-  cursor: pointer;
+  cursor: grab;
   box-shadow: 0 2px 6px rgba(14, 165, 233, 0.3);
   transition: transform 0.1s ease;
 }
 
 input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
+}
+
+input[type="range"]::-webkit-slider-thumb:active {
   transform: scale(1.1);
+  cursor: grabbing;
 }
 
 input[type="range"]::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: #0ea5e9;
-  cursor: pointer;
+  cursor: grab;
   border: none;
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+  transform: scale(1.1);
 }
 
 .tab-active {

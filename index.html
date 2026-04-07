@@ -36,33 +36,39 @@
     </div>
   </div>
 
-  <div class="max-w-7xl mx-auto p-4 space-y-4">
-    <!-- 顶部栏 -->
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <h1 class="text-xl font-bold text-gray-800">人生时间窗口</h1>
-        <span class="text-xs text-gray-500 bg-white px-2 py-1 rounded-full">40个关键节点</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <span class="text-3xl font-bold text-sky-600" id="ageDisplay">30</span>
-        <span class="text-sm text-gray-600">岁</span>
+  <!-- 顶部固定栏 -->
+  <div class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 py-3">
+      <div class="flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <h1 class="text-lg font-bold text-gray-800 whitespace-nowrap">人生时间窗口</h1>
+          <span class="text-[10px] text-gray-500 bg-slate-100 px-2 py-0.5 rounded-full">40节点</span>
+        </div>
+        <div class="flex-1 min-w-0 mx-4">
+          <div class="flex items-center gap-3">
+            <div class="flex gap-1 flex-shrink-0">
+              <button class="btn btn-xs btn-ghost quick-jump px-2" data-age="0">0</button>
+              <button class="btn btn-xs btn-ghost quick-jump px-2" data-age="18">18</button>
+              <button class="btn btn-xs btn-ghost quick-jump px-2" data-age="25">25</button>
+              <button class="btn btn-xs btn-primary quick-jump px-2" data-age="30">30</button>
+              <button class="btn btn-xs btn-ghost quick-jump px-2" data-age="40">40</button>
+              <button class="btn btn-xs btn-ghost quick-jump px-2" data-age="50">50</button>
+              <button class="btn btn-xs btn-ghost quick-jump px-2" data-age="60">60</button>
+            </div>
+            <div class="flex-1 min-w-0 flex items-center gap-3">
+              <input type="range" min="0" max="80" value="30" class="w-full" id="ageSlider" />
+              <div class="flex items-center gap-1 flex-shrink-0">
+                <span class="text-2xl font-bold text-sky-600" id="ageDisplay">30</span>
+                <span class="text-xs text-gray-500">岁</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
+  </div>
 
-    <!-- 年龄滑块 -->
-    <div class="bg-white rounded-xl p-4 shadow-sm">
-      <div class="flex gap-2 mb-3">
-        <button class="btn btn-xs btn-ghost quick-jump" data-age="0">0</button>
-        <button class="btn btn-xs btn-ghost quick-jump" data-age="18">18</button>
-        <button class="btn btn-xs btn-ghost quick-jump" data-age="25">25</button>
-        <button class="btn btn-xs btn-primary quick-jump" data-age="30">30</button>
-        <button class="btn btn-xs btn-ghost quick-jump" data-age="40">40</button>
-        <button class="btn btn-xs btn-ghost quick-jump" data-age="50">50</button>
-        <button class="btn btn-xs btn-ghost quick-jump" data-age="60">60</button>
-      </div>
-      <input type="range" min="0" max="80" value="30" class="w-full" id="ageSlider" />
-    </div>
-
+  <div class="max-w-7xl mx-auto px-4 py-4 space-y-4">
     <!-- 维度进度 -->
     <div class="bg-white rounded-xl p-4 shadow-sm">
       <div class="flex justify-between items-center mb-3">

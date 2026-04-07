@@ -373,7 +373,7 @@ document.addEventListener('DOMContentLoaded', initApp);
 function initOnboarding() {
   const steps = [
     { icon: '👋', title: '欢迎使用人生时间窗口', desc: '40个关键人生窗口，帮你找到每件事的最优时机' },
-    { icon: '🎯', title: '拖动年龄滑块', desc: '调节观测年龄，实时查看不同阶段的窗口状态变化' },
+    { icon: '🎚️', title: '顶部年龄滑块', desc: '滑块固定在顶部，随时拖动查看不同年龄的窗口状态' },
     { icon: '📊', title: '查看表格和卡片', desc: '时间轴表格和卡片列表，点击查看详情和行动建议' }
   ];
   let step = 0;
