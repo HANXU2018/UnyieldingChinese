@@ -78,11 +78,28 @@ function renderTimeline() {
   const totalAge = 80;
   const markers = [0, 20, 40, 60, 80];
 
-  windowData.slice(0, 20).forEach(function(w) {
+  const catLabels = { health: '健康', career: '职业', finance: '财富', relation: '家庭', spirit: '成长', risk: '风险' };
+  const catColors = { health: 'bg-rose-50 text-rose-600', career: 'bg-violet-50 text-violet-600', finance: 'bg-emerald-50 text-emerald-600', relation: 'bg-pink-50 text-pink-600', spirit: 'bg-indigo-50 text-indigo-600', risk: 'bg-orange-50 text-orange-600' };
+
+  let data = windowData;
+
+  if (currentFilter !== 'all') {
+    data = data.filter(function(w) { return w.category === currentFilter; });
+  }
+
+  const statusOrder = { gold: 1, warning: 2, early: 3, risk: 4, close: 5 };
+
+  data = data.slice().sort(function(a, b) {
+    const sa = getWindowStatus(a, currentAge).status;
+    const sb = getWindowStatus(b, currentAge).status;
+    const oa = (statusOrder[sa] || 9);
+    const ob = (statusOrder[sb] || 9);
+    if (oa !== ob) return oa - ob;
+    return a.goldStart - b.goldStart;
+  });
+
+  data.forEach(function(w) {
     const s = getWindowStatus(w, currentAge);
-    const startPct = (w.goldStart / totalAge * 100).toFixed(1);
-    const endPct = (w.goldEnd / totalAge * 100).toFixed(1);
-    const leftPct = ((w.goldStart - currentAge) / totalAge * 100).toFixed(1);
 
     let barHtml = '';
     markers.forEach(function(m, i) {
@@ -93,8 +110,11 @@ function renderTimeline() {
     });
 
     html += '<tr class="border-b border-gray-50 hover:bg-sky-50 cursor-pointer" data-id="' + w.id + '">';
-    html += '<td class="py-2 px-2 text-left">';
+    html += '<td class="py-2 px-2 text-left w-32">';
     html += '<div class="truncate max-w-[120px]" title="' + w.title + '">' + w.title + '</div>';
+    html += '</td>';
+    html += '<td class="py-2 px-1 text-center">';
+    html += '<span class="px-1.5 py-0.5 rounded text-[10px] font-medium ' + (catColors[w.category] || 'bg-gray-100 text-gray-600') + '">' + (catLabels[w.category] || '其他') + '</span>';
     html += '</td>';
     html += barHtml;
     html += '<td class="py-2 px-2 text-center">';
