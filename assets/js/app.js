@@ -1,28 +1,31 @@
-// 人生时间窗口导航系统 - 主应用逻辑
+// 人生时间窗口导航系统 - 重新设计，围绕核心关注点
 
 let currentAge = 30;
-let currentFilter = 'all';
-let currentStatusFilter = 'all';
+let currentView = 'gold';
+let networkSim = null;
 
 const ageSlider = document.getElementById('ageSlider');
 const ageDisplay = document.getElementById('ageDisplay');
-const cardGrid = document.getElementById('cardGrid');
 const modalMask = document.getElementById('modalMask');
 const modalContent = document.getElementById('modalContent');
-const goldNum = document.getElementById('goldNum');
-const warningNum = document.getElementById('warningNum');
-const closeNum = document.getElementById('closeNum');
-const earlyNum = document.getElementById('earlyNum');
+const goldCards = document.getElementById('goldCards');
+const warningCards = document.getElementById('warningCards');
+const earlyCards = document.getElementById('earlyCards');
+const othersCards = document.getElementById('othersCards');
+const goldCount = document.getElementById('goldCount');
+const warningCount = document.getElementById('warningCount');
+const earlyCount = document.getElementById('earlyCount');
 const radarGrid = document.getElementById('radarGrid');
-const timelineTable = document.getElementById('timelineTable');
-const lifeStage = document.getElementById('lifeStage');
+const toggleOthersBtn = document.getElementById('toggleOthersBtn');
+const othersSection = document.getElementById('othersSection');
+const toggleIcon = document.getElementById('toggleIcon');
 
 function getWindowStatus(w, age) {
-  if (age < w.earlyRiskEnd) return { status: 'early', label: '提前', color: 'bg-yellow-100 text-yellow-700', dot: 'bg-yellow-400' };
-  if (age >= w.goldStart && age <= w.goldEnd) return { status: 'gold', label: '黄金', color: 'bg-sky-100 text-sky-700', dot: 'bg-sky-500' };
-  if (age > w.goldEnd && age <= w.lateRiskEnd) return { status: 'warning', label: '预警', color: 'bg-amber-100 text-amber-700', dot: 'bg-amber-500' };
-  if (age > w.lateRiskEnd && age <= w.closeAge) return { status: 'risk', label: '补救', color: 'bg-red-100 text-red-700', dot: 'bg-red-500' };
-  return { status: 'close', label: '关闭', color: 'bg-gray-100 text-gray-700', dot: 'bg-gray-400' };
+  if (age < w.earlyRiskEnd) return { status: 'early', label: '即将开启', color: 'bg-purple-100 text-purple-700', dot: 'bg-purple-400', border: 'border-purple-400' };
+  if (age >= w.goldStart && age <= w.goldEnd) return { status: 'gold', label: '黄金期', color: 'bg-sky-100 text-sky-700', dot: 'bg-sky-500', border: 'border-sky-500' };
+  if (age > w.goldEnd && age <= w.lateRiskEnd) return { status: 'warning', label: '即将关闭', color: 'bg-amber-100 text-amber-700', dot: 'bg-amber-500', border: 'border-amber-500' };
+  if (age > w.lateRiskEnd && age <= w.closeAge) return { status: 'risk', label: '高代价补救', color: 'bg-red-100 text-red-700', dot: 'bg-red-500', border: 'border-red-500' };
+  return { status: 'close', label: '已关闭', color: 'bg-gray-100 text-gray-700', dot: 'bg-gray-400', border: 'border-gray-300' };
 }
 
 function costLabel(level) {
@@ -43,6 +46,70 @@ function getLifeStage(age) {
   return '退休期';
 }
 
+function renderCard(w) {
+  const s = getWindowStatus(w, currentAge);
+  const catIcons = { health: '❤️', career: '💼', finance: '💰', relation: '💕', spirit: '🧠', risk: '🛡️' };
+  const catLabels = { health: '健康', career: '职业', finance: '财富', relation: '家庭', spirit: '成长', risk: '风险' };
+
+  const html = '<div class="bg-white rounded-xl p-5 shadow-sm hover:shadow-lg cursor-pointer border-l-4 ' + s.border + ' transition-all" data-id="' + w.id + '">';
+  html += '<div class="flex items-start justify-between mb-3">';
+  html += '<div class="flex items-center gap-2">';
+  html += '<span class="text-2xl">' + (catIcons[w.category] || '📋') + '</span>';
+  html += '<span class="px-2 py-1 rounded-lg text-xs font-medium ' + s.color + '">' + s.label + '</span>';
+  html += '</div>';
+  html += '<span class="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">' + w.goldStart + '-' + w.goldEnd + '岁</span>';
+  html += '</div>';
+  html += '<h3 class="text-base font-bold text-gray-800 mb-2">' + w.title + '</h3>';
+  html += '<p class="text-sm text-gray-600 mb-4 line-clamp-2">' + w.desc + '</p>';
+  html += '<div class="space-y-2">';
+  html += '<div class="flex items-center justify-between text-xs text-gray-500">';
+  html += '<span>维度: ' + (catLabels[w.category] || '其他') + '</span>';
+  html += '<span>锁死力: ' + w.lockForce + '%</span>';
+  html += '</div>';
+  html += '<div class="flex items-center justify-between text-xs text-gray-500">';
+  html += '<span>提前代价: ' + costLabel(w.earlyCost) + '</span>';
+  html += '<span>滞后代价: ' + costLabel(w.lateCost) + '</span>';
+  html += '</div>';
+  html += '</div>';
+  html += '</div>';
+  return html;
+}
+
+function renderAllCards() {
+  const gold = windowData.filter(function(w) {
+    const s = getWindowStatus(w, currentAge);
+    return s.status === 'gold';
+  }).sort(function(a, b) { return b.lockForce - a.lockForce; });
+
+  const warning = windowData.filter(function(w) {
+    const s = getWindowStatus(w, currentAge);
+    return s.status === 'warning' || s.status === 'risk';
+  }).sort(function(a, b) { return b.lockForce - a.lockForce; });
+
+  const early = windowData.filter(function(w) {
+    const s = getWindowStatus(w, currentAge);
+    return s.status === 'early';
+  }).sort(function(a, b) { return a.goldStart - b.goldStart; });
+
+  const others = windowData.filter(function(w) {
+    const s = getWindowStatus(w, currentAge);
+    return s.status === 'close';
+  }).sort(function(a, b) { return b.lockForce - a.lockForce; });
+
+  goldCards.innerHTML = gold.map(renderCard).join('');
+  warningCards.innerHTML = warning.map(renderCard).join('');
+  earlyCards.innerHTML = early.map(renderCard).join('');
+  othersCards.innerHTML = others.map(renderCard).join('');
+
+  goldCount.textContent = '(' + gold.length + '个)';
+  warningCount.textContent = '(' + warning.length + '个)';
+  earlyCount.textContent = '(' + early.length + '个)';
+
+  document.querySelectorAll('[data-id]').forEach(function(el) {
+    el.addEventListener('click', function() { openModal(el.dataset.id); });
+  });
+}
+
 function renderRadar() {
   const dims = [
     { key: 'health', name: '健康', icon: '❤️' },
@@ -52,139 +119,28 @@ function renderRadar() {
     { key: 'spirit', name: '成长', icon: '🧠' },
     { key: 'risk', name: '风险', icon: '🛡️' }
   ];
+
   let html = '';
   dims.forEach(function(d) {
     const ws = windowData.filter(function(w) { return w.category === d.key; });
     let done = 0;
     ws.forEach(function(w) {
-      const s = getWindowStatus(w, currentAge).status;
-      if (s === 'gold' || s === 'close') done++;
+      const s = getWindowStatus(w, currentAge);
+      if (s.status === 'gold' || s.status === 'close') done++;
     });
     const pct = Math.round((done / ws.length) * 100) || 0;
+    const total = ws.length;
+
     html += '<div class="text-center">';
-    html += '<div class="h-12 flex items-end justify-center mb-1">';
-    html += '<div class="w-3 bg-sky-500 rounded-t transition-all" style="height:' + pct + '%"></div>';
+    html += '<div class="h-14 flex items-end justify-center mb-1">';
+    html += '<div class="w-4 bg-sky-500 rounded-t transition-all" style="height:' + pct + '%"></div>';
     html += '</div>';
-    html += '<div class="text-xs font-bold text-sky-600">' + pct + '%</div>';
-    html += '<div class="text-[10px] text-gray-400">' + d.name + '</div>';
+    html += '<div class="text-lg font-bold text-sky-600">' + pct + '%</div>';
+    html += '<div class="text-xs text-gray-500">' + d.name + '</div>';
+    html += '<div class="text-[10px] text-gray-400">' + done + '/' + total + '</div>';
     html += '</div>';
   });
   radarGrid.innerHTML = html;
-  lifeStage.textContent = getLifeStage(currentAge);
-}
-
-function renderTimeline() {
-  let html = '';
-  const totalAge = 80;
-  const markers = [0, 20, 40, 60, 80];
-
-  const catLabels = { health: '健康', career: '职业', finance: '财富', relation: '家庭', spirit: '成长', risk: '风险' };
-  const catColors = { health: 'bg-rose-50 text-rose-600', career: 'bg-violet-50 text-violet-600', finance: 'bg-emerald-50 text-emerald-600', relation: 'bg-pink-50 text-pink-600', spirit: 'bg-indigo-50 text-indigo-600', risk: 'bg-orange-50 text-orange-600' };
-
-  let data = windowData;
-
-  if (currentFilter !== 'all') {
-    data = data.filter(function(w) { return w.category === currentFilter; });
-  }
-
-  const statusOrder = { gold: 1, warning: 2, early: 3, risk: 4, close: 5 };
-
-  data = data.slice().sort(function(a, b) {
-    const sa = getWindowStatus(a, currentAge).status;
-    const sb = getWindowStatus(b, currentAge).status;
-    const oa = (statusOrder[sa] || 9);
-    const ob = (statusOrder[sb] || 9);
-    if (oa !== ob) return oa - ob;
-    return a.goldStart - b.goldStart;
-  });
-
-  data.forEach(function(w) {
-    const s = getWindowStatus(w, currentAge);
-
-    let barHtml = '';
-    markers.forEach(function(m, i) {
-      const isStart = m >= w.goldStart && m <= w.goldEnd;
-      barHtml += '<td class="border-r border-gray-100 py-1 px-1 text-center">';
-      if (isStart) barHtml += '<div class="w-2 h-2 mx-auto rounded-full ' + s.dot + '"></div>';
-      barHtml += '</td>';
-    });
-
-    html += '<tr class="border-b border-gray-50 hover:bg-sky-50 cursor-pointer" data-id="' + w.id + '">';
-    html += '<td class="py-2 px-2 text-left w-32">';
-    html += '<div class="truncate max-w-[120px]" title="' + w.title + '">' + w.title + '</div>';
-    html += '</td>';
-    html += '<td class="py-2 px-1 text-center">';
-    html += '<span class="px-1.5 py-0.5 rounded text-[10px] font-medium ' + (catColors[w.category] || 'bg-gray-100 text-gray-600') + '">' + (catLabels[w.category] || '其他') + '</span>';
-    html += '</td>';
-    html += barHtml;
-    html += '<td class="py-2 px-2 text-center">';
-    html += '<span class="px-2 py-1 rounded text-xs font-medium ' + s.color + '">' + s.label + '</span>';
-    html += '</td>';
-    html += '</tr>';
-  });
-  timelineTable.innerHTML = html;
-
-  document.querySelectorAll('#timelineTable tr').forEach(function(tr) {
-    tr.addEventListener('click', function() { openModal(tr.dataset.id); });
-  });
-}
-
-function renderCards() {
-  let data = windowData;
-
-  if (currentFilter !== 'all') {
-    data = data.filter(function(w) { return w.category === currentFilter; });
-  }
-  if (currentStatusFilter !== 'all') {
-    data = data.filter(function(w) {
-      const s = getWindowStatus(w, currentAge);
-      if (currentStatusFilter === 'warning') return s.status === 'warning' || s.status === 'risk';
-      return s.status === currentStatusFilter;
-    });
-  }
-
-  const order = { gold: 1, warning: 2, early: 3, risk: 4, close: 5 };
-  data = data.slice().sort(function(a, b) {
-    return (order[getWindowStatus(a, currentAge).status] || 9) - (order[getWindowStatus(b, currentAge).status] || 9);
-  });
-
-  let gc = 0, wc = 0, ec = 0, cc = 0;
-  windowData.forEach(function(w) {
-    const s = getWindowStatus(w, currentAge).status;
-    if (s === 'gold') gc++;
-    else if (s === 'warning' || s === 'risk') wc++;
-    else if (s === 'early') ec++;
-    else if (s === 'close') cc++;
-  });
-  goldNum.textContent = gc;
-  warningNum.textContent = wc;
-  earlyNum.textContent = ec;
-  closeNum.textContent = cc;
-
-  const icons = { health: '❤️', career: '💼', finance: '💰', relation: '💕', spirit: '🧠', risk: '🛡️' };
-  const borders = { gold: 'border-sky-400', warning: 'border-amber-400', early: 'border-yellow-400', risk: 'border-red-400', close: 'border-gray-300' };
-
-  let html = '';
-  data.forEach(function(w) {
-    const s = getWindowStatus(w, currentAge);
-    html += '<div class="bg-white rounded-lg p-3 shadow-sm hover:shadow-md cursor-pointer border-l-4 ' + borders[s.status] + ' transition-shadow" data-id="' + w.id + '">';
-    html += '<div class="flex items-center gap-2 mb-2">';
-    html += '<span class="text-lg">' + (icons[w.category] || '📋') + '</span>';
-    html += '<span class="px-2 py-0.5 rounded text-[10px] font-medium ' + s.color + '">' + s.label + '</span>';
-    html += '</div>';
-    html += '<div class="text-xs font-medium text-gray-800 truncate mb-1" title="' + w.title + '">' + w.title + '</div>';
-    html += '<div class="text-[10px] text-gray-500 line-clamp-2 mb-2">' + w.desc + '</div>';
-    html += '<div class="flex justify-between items-center text-[10px] text-gray-400">';
-    html += '<span>🔒' + w.lockForce + '%</span>';
-    html += '<span>⚠️' + costLabel(w.lateCost) + '</span>';
-    html += '</div>';
-    html += '</div>';
-  });
-  cardGrid.innerHTML = html;
-
-  document.querySelectorAll('#cardGrid > div').forEach(function(card) {
-    card.addEventListener('click', function() { openModal(card.dataset.id); });
-  });
 }
 
 function openModal(id) {
@@ -205,69 +161,71 @@ function openModal(id) {
     close: '窗口已关闭，此项基本不可逆，接受现状，聚焦仍开放的窗口。'
   }[s.status] || '';
 
-  const icons = { health: '❤️', career: '💼', finance: '💰', relation: '💕', spirit: '🧠', risk: '🛡️' };
+  const catIcons = { health: '❤️', career: '💼', finance: '💰', relation: '💕', spirit: '🧠', risk: '🛡️' };
+  const catLabels = { health: '健康', career: '职业', finance: '财富', relation: '家庭', spirit: '成长', risk: '风险' };
 
   let html = '';
-  html += '<div class="flex justify-between items-center p-4 border-b border-gray-100">';
+  html += '<div class="flex justify-between items-center p-5 border-b border-gray-100">';
   html += '<div class="flex-1">';
-  html += '<div class="flex items-center gap-2 mb-1">';
-  html += '<span class="text-2xl">' + (icons[w.category] || '📋') + '</span>';
-  html += '<span class="px-2 py-1 rounded text-xs font-medium ' + s.color + '">' + s.label + '</span>';
+  html += '<div class="flex items-center gap-3 mb-2">';
+  html += '<span class="text-3xl">' + (catIcons[w.category] || '📋') + '</span>';
+  html += '<span class="px-3 py-1.5 rounded-lg text-sm font-medium ' + s.color + '">' + s.label + '</span>';
+  html += '<span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">' + catLabels[w.category] + '</span>';
   html += '</div>';
-  html += '<h2 class="text-lg font-bold text-gray-800">' + w.title + '</h2>';
+  html += '<h2 class="text-xl font-bold text-gray-800">' + w.title + '</h2>';
   html += '</div>';
-  html += '<button class="text-2xl text-gray-400 hover:text-gray-600 close-btn">×</button>';
+  html += '<button class="text-3xl text-gray-400 hover:text-gray-600 close-btn">×</button>';
   html += '</div>';
 
-  html += '<div class="tabs tabs-boxed px-4 pt-3">';
+  html += '<div class="tabs tabs-boxed px-5 pt-4">';
   html += '<a class="tab tab-active text-sm" data-tab="overview">概览</a>';
   html += '<a class="tab text-sm" data-tab="actions">行动建议</a>';
   html += '</div>';
 
   html += '<div class="flex-1 overflow-y-auto">';
 
-  html += '<div class="modal-section p-4" data-section="overview">';
+  html += '<div class="modal-section p-5" data-section="overview">';
   if (advice) {
-    html += '<div class="mb-4 p-3 bg-green-50 border-l-4 border-green-500 rounded text-sm text-green-800">' + advice + '</div>';
+    html += '<div class="mb-5 p-4 bg-green-50 border-l-4 border-green-500 rounded-lg text-sm text-green-800">' + advice + '</div>';
   }
-  html += '<div class="mb-4 p-3 bg-gray-50 rounded-lg">';
-  html += '<h4 class="text-sm font-semibold text-gray-800 mb-2">时间窗口</h4>';
-  html += '<div class="h-8 bg-gray-200 rounded relative mb-3">';
-  html += '<div class="absolute top-1/2 -translate-y-1/2 h-4 bg-sky-500 rounded" style="left:' + goldLeft + '%;width:' + goldWidth + '%"></div>';
-  html += '<div class="absolute top-0 w-0.5 h-8 bg-red-500" style="left:' + currentLeft + '%"></div>';
+  html += '<div class="mb-5 p-4 bg-gray-50 rounded-xl">';
+  html += '<h4 class="text-sm font-semibold text-gray-800 mb-3">时间窗口周期</h4>';
+  html += '<div class="h-10 bg-gray-200 rounded-lg relative mb-4">';
+  html += '<div class="absolute top-1/2 -translate-y-1/2 h-5 bg-sky-500 rounded-lg" style="left:' + goldLeft + '%;width:' + goldWidth + '%"></div>';
+  html += '<div class="absolute top-0 w-0.5 h-10 bg-red-500" style="left:' + currentLeft + '%"></div>';
   html += '</div>';
-  html += '<div class="grid grid-cols-3 gap-2 text-xs text-center">';
-  html += '<div class="bg-white p-2 rounded"><div class="text-gray-500">开启</div><div class="font-bold">' + w.goldStart + '岁</div></div>';
-  html += '<div class="bg-white p-2 rounded"><div class="text-gray-500">黄金期</div><div class="font-bold">' + w.goldStart + '-' + w.goldEnd + '岁</div></div>';
-  html += '<div class="bg-white p-2 rounded"><div class="text-gray-500">关闭</div><div class="font-bold">' + w.closeAge + '岁</div></div>';
-  html += '</div>';
-  html += '</div>';
-
-  html += '<div class="grid grid-cols-2 gap-3 mb-4">';
-  html += '<div class="p-3 bg-yellow-50 rounded-lg border border-yellow-200">';
-  html += '<h5 class="text-xs font-medium text-gray-700 mb-1">提前代价</h5>';
-  html += '<div class="text-xl font-bold text-yellow-600">' + costLabel(w.earlyCost) + '</div>';
-  html += '<div class="text-xs text-gray-500">' + w.earlyCostDesc + '</div>';
-  html += '</div>';
-  html += '<div class="p-3 bg-red-50 rounded-lg border border-red-200">';
-  html += '<h5 class="text-xs font-medium text-gray-700 mb-1">滞后代价</h5>';
-  html += '<div class="text-xl font-bold text-red-600">' + costLabel(w.lateCost) + '</div>';
-  html += '<div class="text-xs text-gray-500">' + w.lateCostDesc + '</div>';
+  html += '<div class="grid grid-cols-3 gap-3 text-center">';
+  html += '<div class="bg-white p-3 rounded-lg"><div class="text-sm text-gray-500 mb-1">开启</div><div class="text-lg font-bold text-gray-800">' + w.goldStart + '岁</div></div>';
+  html += '<div class="bg-white p-3 rounded-lg"><div class="text-sm text-gray-500 mb-1">黄金期</div><div class="text-lg font-bold text-sky-600">' + w.goldStart + '-' + w.goldEnd + '岁</div></div>';
+  html += '<div class="bg-white p-3 rounded-lg"><div class="text-sm text-gray-500 mb-1">关闭</div><div class="text-lg font-bold text-gray-800">' + w.closeAge + '岁</div></div>';
   html += '</div>';
   html += '</div>';
 
-  html += '<div class="grid grid-cols-3 gap-3 mb-4">';
-  html += '<div class="p-3 bg-sky-50 rounded-lg text-center border border-sky-200">';
-  html += '<div class="text-2xl font-bold text-sky-600">' + w.lockForce + '%</div>';
-  html += '<div class="text-xs text-gray-500 mt-1">锁死强制力</div>';
+  html += '<div class="grid grid-cols-2 gap-4 mb-5">';
+  html += '<div class="p-4 bg-yellow-50 rounded-xl border border-yellow-200">';
+  html += '<h5 class="text-sm font-medium text-gray-700 mb-2">提前代价</h5>';
+  html += '<div class="text-3xl font-bold text-yellow-600 mb-1">' + costLabel(w.earlyCost) + '</div>';
+  html += '<div class="text-sm text-gray-600">' + w.earlyCostDesc + '</div>';
   html += '</div>';
-  html += '<div class="p-3 bg-purple-50 rounded-lg text-center border border-purple-200">';
-  html += '<div class="text-lg font-bold text-purple-600">' + w.categoryName + '</div>';
-  html += '<div class="text-xs text-gray-500 mt-1">维度</div>';
+  html += '<div class="p-4 bg-red-50 rounded-xl border border-red-200">';
+  html += '<h5 class="text-sm font-medium text-gray-700 mb-2">滞后代价</h5>';
+  html += '<div class="text-3xl font-bold text-red-600 mb-1">' + costLabel(w.lateCost) + '</div>';
+  html += '<div class="text-sm text-gray-600">' + w.lateCostDesc + '</div>';
   html += '</div>';
-  html += '<div class="p-3 bg-white rounded-lg">';
-  html += '<h5 class="text-xs font-medium text-gray-700 mb-2">关键数据</h5>';
-  html += '<div class="text-xs text-gray-600 space-y-1">';
+  html += '</div>';
+
+  html += '<div class="grid grid-cols-3 gap-4 mb-5">';
+  html += '<div class="p-4 bg-sky-50 rounded-xl text-center border border-sky-200">';
+  html += '<div class="text-4xl font-bold text-sky-600 mb-1">' + w.lockForce + '%</div>';
+  html += '<div class="text-sm text-gray-500">锁死强制力</div>';
+  html += '</div>';
+  html += '<div class="p-4 bg-purple-50 rounded-xl text-center border border-purple-200">';
+  html += '<div class="text-xl font-bold text-purple-600 mb-1">' + catLabels[w.category] + '</div>';
+  html += '<div class="text-sm text-gray-500">所属维度</div>';
+  html += '</div>';
+  html += '<div class="p-4 bg-white rounded-xl border border-gray-200">';
+  html += '<h5 class="text-sm font-medium text-gray-700 mb-2">关键数据</h5>';
+  html += '<div class="text-sm text-gray-600 space-y-1">';
   html += '<div>禁忌期: 0-' + w.earlyRiskEnd + '岁</div>';
   html += '<div>黄金期: ' + w.goldStart + '-' + w.goldEnd + '岁</div>';
   html += '<div>补救期: ' + w.goldEnd + '-' + w.lateRiskEnd + '岁</div>';
@@ -276,25 +234,25 @@ function openModal(id) {
   html += '</div>';
   html += '</div>';
 
-  html += '<div class="p-3 bg-gray-50 rounded-lg border border-gray-200 text-sm">';
+  html += '<div class="p-4 bg-gray-50 rounded-xl border border-gray-200 text-sm">';
   html += '<div class="font-semibold text-gray-800 mb-1">📚 科学依据</div>';
   html += '<div class="text-gray-600">' + w.source + '</div>';
   html += '</div>';
 
   html += '</div>';
 
-  html += '<div class="modal-section hidden p-4" data-section="actions">';
-  html += '<h4 class="text-sm font-semibold text-gray-800 mb-3">📋 行动建议</h4>';
-  html += '<ul class="space-y-2">';
+  html += '<div class="modal-section hidden p-5" data-section="actions">';
+  html += '<h4 class="text-sm font-semibold text-gray-800 mb-4">📋 行动建议</h4>';
+  html += '<ul class="space-y-3">';
   w.actionList.forEach(function(a) {
-    html += '<li class="flex items-start gap-2 p-2 bg-gray-50 rounded text-sm">';
-    html += '<span class="text-green-500 font-bold">✓</span>';
-    html += '<span>' + a + '</span>';
+    html += '<li class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg text-sm">';
+    html += '<span class="text-green-500 font-bold text-lg">✓</span>';
+    html += '<span class="flex-1">' + a + '</span>';
     html += '</li>';
   });
   html += '</ul>';
   if (advice) {
-    html += '<div class="mt-4 p-3 bg-amber-50 border-l-4 border-amber-500 rounded text-sm text-amber-800">' + advice + '</div>';
+    html += '<div class="mt-5 p-4 bg-amber-50 border-l-4 border-amber-500 rounded-lg text-sm text-amber-800">' + advice + '</div>';
   }
   html += '</div>';
 
@@ -326,9 +284,8 @@ modalMask.addEventListener('click', function(e) {
 });
 
 function updateAll() {
+  renderAllCards();
   renderRadar();
-  renderTimeline();
-  renderCards();
 }
 
 function initApp() {
@@ -340,10 +297,7 @@ function initApp() {
 
   document.querySelectorAll('.quick-jump').forEach(function(btn) {
     btn.addEventListener('click', function() {
-      document.querySelectorAll('.quick-jump').forEach(function(b) {
-        b.classList.remove('active', 'btn-primary');
-        b.classList.add('btn-ghost');
-      });
+      document.querySelectorAll('.quick-jump').forEach(function(b) { b.classList.remove('active', 'btn-primary'); b.classList.add('btn-ghost'); });
       btn.classList.add('active', 'btn-primary');
       btn.classList.remove('btn-ghost');
       currentAge = parseInt(btn.dataset.age);
@@ -353,34 +307,28 @@ function initApp() {
     });
   });
 
-  document.querySelectorAll('.filter-btn').forEach(function(btn) {
+  document.querySelectorAll('.status-filter-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
-      const filterType = btn.dataset.filter;
-      const statusType = btn.dataset.status;
-
-      if (filterType) {
-        document.querySelectorAll('.filter-btn[data-filter]').forEach(function(b) {
-          b.classList.remove('btn-primary');
-          b.classList.add('btn-ghost');
-        });
-        btn.classList.remove('btn-ghost');
-        btn.classList.add('btn-primary');
-        currentFilter = filterType;
-      } else if (statusType) {
-        document.querySelectorAll('.filter-btn[data-status]').forEach(function(b) {
-          b.classList.remove('btn-primary');
-          b.classList.add('btn-outline');
-        });
-        if (currentStatusFilter === statusType) {
-          currentStatusFilter = 'all';
-        } else {
-          btn.classList.remove('btn-outline');
-          btn.classList.add('btn-primary');
-          currentStatusFilter = statusType;
-        }
-      }
-      renderCards();
+      const status = btn.dataset.status;
+      currentView = status;
+      document.querySelectorAll('.status-filter-btn').forEach(function(b) {
+        b.classList.remove('ring-2', 'ring-offset-1', 'ring-sky-300');
+      });
+      btn.classList.add('ring-2', 'ring-offset-1', 'ring-sky-300');
     });
+  });
+
+  toggleOthersBtn.addEventListener('click', function() {
+    const isHidden = othersSection.classList.contains('hidden');
+    if (isHidden) {
+      othersSection.classList.remove('hidden');
+      toggleIcon.style.transform = 'rotate(180deg)';
+      toggleOthersBtn.querySelector('span').textContent = '收起其他窗口';
+    } else {
+      othersSection.classList.add('hidden');
+      toggleIcon.style.transform = 'rotate(0deg)';
+      toggleOthersBtn.querySelector('span').textContent = '查看其他窗口';
+    }
   });
 
   updateAll();
@@ -394,7 +342,7 @@ function initOnboarding() {
   const steps = [
     { icon: '👋', title: '欢迎使用人生时间窗口', desc: '40个关键人生窗口，帮你找到每件事的最优时机' },
     { icon: '🎚️', title: '顶部年龄滑块', desc: '滑块固定在顶部，随时拖动查看不同年龄的窗口状态' },
-    { icon: '📊', title: '查看表格和卡片', desc: '时间轴表格和卡片列表，点击查看详情和行动建议' }
+    { icon: '📊', title: '三大核心分区', desc: '黄金期(该做的事)、即将关闭(紧急)、即将开启(规划)，点击卡片查看详情' }
   ];
   let step = 0;
   const mask = document.getElementById('onboardingMask');

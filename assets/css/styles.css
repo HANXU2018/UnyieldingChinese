@@ -1,4 +1,4 @@
-/* Custom Styles for 人生时间窗口导航系统 */
+/* Custom Styles for 人生时间窗口导航系统 - 重新设计版 */
 
 * {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -9,41 +9,11 @@ body {
   margin: 0;
 }
 
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}
-
-.truncate {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.card-status {
-  font-size: 10px;
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-
-.window-card {
-  transition: all 0.2s ease;
-}
-
-.window-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
 /* Top sticky age slider */
@@ -59,18 +29,18 @@ input[type="range"] {
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   background: #0ea5e9;
   cursor: grab;
-  box-shadow: 0 2px 6px rgba(14, 165, 233, 0.3);
-  transition: transform 0.1s ease;
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.4);
+  transition: transform 0.15s ease;
 }
 
 input[type="range"]::-webkit-slider-thumb:hover {
-  transform: scale(1.15);
-  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
+  transform: scale(1.2);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.5);
 }
 
 input[type="range"]::-webkit-slider-thumb:active {
@@ -79,32 +49,69 @@ input[type="range"]::-webkit-slider-thumb:active {
 }
 
 input[type="range"]::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   background: #0ea5e9;
   cursor: grab;
   border: none;
 }
 
-input[type="range"]::-moz-range-thumb:hover {
-  transform: scale(1.1);
+/* Status filter buttons */
+.status-filter-btn {
+  transition: all 0.2s ease;
 }
 
+.status-filter-btn:hover {
+  transform: scale(1.05);
+}
+
+/* Card styles */
+[data-id] {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-id]:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Section divider */
+h2 {
+  letter-spacing: -0.02em;
+}
+
+/* Tab styles */
 .tab-active {
   color: #0ea5e9;
   border-bottom: 2px solid #0ea5e9;
 }
 
+/* Modal animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 .modal-mask {
-  animation: fadeIn 0.2s ease-out;
+  animation: fadeIn 0.25s ease-out;
 }
 
 .modal-content {
-  animation: fadeIn 0.2s ease-out;
+  animation: fadeIn 0.25s ease-out;
+}
+
+/* Pulse animation for warning indicator */
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Progress bar transition */
+.bg-sky-500 {
+  transition: height 0.3s ease-out;
 }
