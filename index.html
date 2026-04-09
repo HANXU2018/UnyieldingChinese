@@ -1,317 +1,134 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="light">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>人生时间窗口导航系统</title>
-
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- DaisyUI -->
-  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
-
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-  <style>
-    * {
-      font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    }
-
-    body {
-      background: linear-gradient(135deg, #faf7f5 0%, #f0f4f8 100%);
-      min-height: 100vh;
-      padding: 0;
-      margin: 0;
-    }
-
-    .title-serif {
-      font-family: 'Noto Serif SC', serif;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-8px); }
-    }
-
-    @keyframes breathe {
-      0%, 100% { opacity: 0.6; transform: scale(1); }
-      50% { opacity: 1; transform: scale(1.02); }
-    }
-
-    @keyframes shimmer {
-      0% { background-position: -200% center; }
-      100% { background-position: 200% center; }
-    }
-
-    .glass-panel {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-
-    .section-title {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #4b5563;
-      letter-spacing: 0.15em;
-    }
-
-    .subtitle {
-      font-size: 0.875rem;
-      font-weight: 400;
-      color: #6b7280;
-    }
-
-    .card-soft-shadow {
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06),
-                  0 8px 30px rgba(0, 0, 0, 0.04);
-    }
-
-    .card-hover-lift:hover {
-      transform: translateY(-6px) scale(1.02);
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08),
-                  0 6px 20px rgba(0, 0, 0, 0.05);
-    }
-
-    .status-badge {
-      font-size: 0.7rem;
-      font-weight: 500;
-      padding: 0.375rem 0.75rem;
-      border-radius: 9999px;
-      letter-spacing: 0.05em;
-    }
-
-    .age-number {
-      font-family: 'Noto Serif SC', serif;
-      font-size: 2.5rem;
-      font-weight: 600;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-fill-color: transparent;
-    }
-
-    .progress-bar {
-      height: 0.5rem;
-      border-radius: 999px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      animation: shimmer 2s linear infinite;
-      background: linear-gradient(90deg, #667eea, #764ba2, #667eea, #764ba2);
-      background-size: 200% 100%;
-    }
-
-    .slider-track {
-      background: linear-gradient(90deg, #e0e7ff 0%, #b8e0ff 100%);
-      height: 0.375rem;
-      border-radius: 9999px;
-    }
-
-    .slider-thumb::-webkit-slider-thumb {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3),
-                  0 0 20px rgba(102, 126, 234, 0.1);
-    }
-
-    .status-gold {
-      background: linear-gradient(135deg, #fef3c7 0%, #fce7f3 100%);
-      color: #92400e;
-      border: 1px solid #fbbf24;
-    }
-
-    .status-warning {
-      background: linear-gradient(135deg, #fff7ed 0%, #fcd34d 100%);
-      color: #b45309;
-      border: 1px solid #f59e0b;
-      animation: breathe 2s ease-in-out infinite;
-    }
-
-    .status-early {
-      background: linear-gradient(135deg, #fae8ff 0%, #e0e7ff 100%);
-      color: #4338ca;
-      border: 1px solid #818cf8;
-    }
-
-    .status-close {
-      background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-      color: #6b7280;
-      border: 1px solid #d1d5db;
-    }
-
-    .section-divider {
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.06) 20%, transparent, rgba(0, 0, 0, 0.06) 80%, transparent);
-    }
-
-    .card-icon {
-      font-size: 1.25rem;
-      line-height: 1;
-    }
-
-    .tag-pill {
-      font-size: 0.65rem;
-      font-weight: 500;
-      color: #6b7280;
-      background: rgba(107, 114, 128, 0.08);
-      padding: 0.25rem 0.5rem;
-      border-radius: 999px;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .animate-fadeIn {
-      animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .modal-backdrop {
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(8px);
-    }
-  </style>
+  <title>人生窗口 · 高密度决策台</title>
+  <meta
+    name="description"
+    content="基于人生窗口数据的高密度信息可视化决策页面，支持年龄切片、状态筛选、维度分布与详情展开。"
+  />
+  <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
 <body>
-  <!-- 新手引导弹窗 -->
-  <div id="onboardingMask" class="fixed inset-0 z-[100] flex items-center justify-center p-4 modal-backdrop animate-fadeIn">
-    <div class="bg-white rounded-2xl max-w-sm w-full p-8 shadow-2xl text-center">
-      <div class="text-5xl mb-4" id="onboardingIcon">👋</div>
-      <h2 class="text-lg font-bold mb-2 title-serif" id="onboardingTitle">欢迎使用人生时间窗口</h2>
-      <p class="text-gray-500 text-sm mb-4" id="onboardingDesc">40个关键人生窗口，帮你找到每件事的最优时机</p>
-      <div class="flex justify-center gap-2 mb-4">
-        <div class="w-2 h-2 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 onboarding-dot" data-step="0"></div>
-        <div class="w-2 h-2 rounded-full bg-gray-200 onboarding-dot" data-step="1"></div>
-        <div class="w-2 h-2 rounded-full bg-gray-200 onboarding-dot" data-step="2"></div>
-      </div>
-      <div class="flex gap-2">
-        <button id="onboardingSkip" class="btn btn-sm btn-ghost flex-1 text-gray-500 hover:text-gray-700">跳过</button>
-        <button id="onboardingNext" class="btn btn-sm btn-primary flex-1 bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:shadow-lg transition-shadow">下一步</button>
-      </div>
-    </div>
-  </div>
+  <div class="bg-glow glow-a" aria-hidden="true"></div>
+  <div class="bg-glow glow-b" aria-hidden="true"></div>
 
-  <!-- 顶部固定栏 -->
-  <div class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-lg">
-    <div class="max-w-6xl mx-auto px-6 py-4">
-      <div class="flex items-center justify-between gap-8">
-        <div class="flex items-center gap-3">
-          <h1 class="text-xl font-semibold text-gray-800 title-serif">人生时间窗口</h1>
-          <span class="text-xs text-gray-500 bg-gradient-to-r from-rose-100 to-rose-200 px-3 py-1 rounded-full">40个关键节点</span>
-        </div>
-        <div class="flex items-center gap-4 flex-1 min-w-0">
-          <div class="flex gap-2">
-            <button class="status-filter-btn text-xs font-medium px-3 py-1.5 rounded-full status-gold transition-shadow" data-status="gold">黄金期</button>
-            <button class="status-filter-btn text-xs font-medium px-3 py-1.5 rounded-full transition-shadow" data-status="warning">即将关闭</button>
-            <button class="status-filter-btn text-xs font-medium px-3 py-1.5 rounded-full transition-shadow" data-status="early">即将开启</button>
-            <button class="status-filter-btn text-xs font-medium px-3 py-1.5 rounded-full transition-shadow" data-status="close">已错失</button>
+  <div class="app-shell">
+    <header class="hero">
+      <p class="eyebrow">LIFE WINDOW STRATEGY</p>
+      <h1>人生窗口 · 高密度决策台</h1>
+      <p class="hero-copy">一页读懂人生窗口状态、时间窗口与行动优先级，支持手机端快速扫描与决策。</p>
+
+      <section class="control-bar" aria-label="筛选和时间控制">
+        <div class="control-age">
+          <div>
+            <p class="meta-label">当前年龄</p>
+            <div class="age-display"><span id="ageValue">30</span><span>岁</span></div>
+            <p id="lifeStage" class="life-stage">成家立业期</p>
           </div>
-          <div class="flex items-center gap-3">
-            <div class="flex gap-1 flex-shrink-0">
-              <button class="btn btn-xs btn-ghost bg-gray-50 hover:bg-gray-100 quick-jump px-2.5" data-age="0">0</button>
-              <button class="btn btn-xs btn-ghost bg-gray-50 hover:bg-gray-100 quick-jump px-2.5" data-age="20">20</button>
-              <button class="btn btn-xs btn-ghost bg-gray-50 hover:bg-gray-100 quick-jump px-2.5" data-age="30">30</button>
-              <button class="btn btn-xs btn-ghost bg-gray-50 hover:bg-gray-100 quick-jump px-2.5" data-age="40">40</button>
-              <button class="btn btn-xs btn-ghost bg-gray-50 hover:bg-gray-100 quick-jump px-2.5" data-age="50">50</button>
-              <button class="btn btn-xs btn-ghost bg-gray-50 hover:bg-gray-100 quick-jump px-2.5" data-age="60">60</button>
-            </div>
-            <div class="flex items-center gap-2 flex-shrink-0">
-              <input type="range" min="0" max="80" value="30" class="w-48 slider-track" id="ageSlider" />
-              <span class="age-number px-3 text-white" id="ageDisplay">30</span>
-              <span class="text-sm text-gray-500 ml-1">岁</span>
-            </div>
+          <div class="age-buttons" aria-label="常用年龄节点">
+            <button type="button" class="age-chip" data-age="16">16</button>
+            <button type="button" class="age-chip" data-age="22">22</button>
+            <button type="button" class="age-chip" data-age="30">30</button>
+            <button type="button" class="age-chip" data-age="40">40</button>
+            <button type="button" class="age-chip" data-age="50">50</button>
+            <button type="button" class="age-chip" data-age="65">65</button>
           </div>
         </div>
+
+        <div class="control-slider">
+          <label for="ageSlider" class="meta-label">拖动更新年龄切片</label>
+          <div class="age-range-hint"><span>0</span><span>90</span></div>
+          <input id="ageSlider" class="age-slider" type="range" min="0" max="90" value="30" />
+        </div>
+
+        <div class="control-filters">
+          <label class="field">
+            <span class="meta-label">搜索</span>
+            <input id="searchInput" type="search" placeholder="关键词：学习、资产、婚恋、迁移..." />
+          </label>
+          <label class="field">
+            <span class="meta-label">维度</span>
+            <select id="categorySelect">
+              <option value="all">全部维度</option>
+              <option value="health">生理健康</option>
+              <option value="career">学业职业</option>
+              <option value="finance">财富资产</option>
+              <option value="relation">亲密家庭</option>
+              <option value="spirit">精神成长</option>
+              <option value="risk">风险兜底</option>
+            </select>
+          </label>
+          <label class="field">
+            <span class="meta-label">状态</span>
+            <select id="statusSelect">
+              <option value="all">全部</option>
+              <option value="gold">现在做</option>
+              <option value="warning">快关闭</option>
+              <option value="risk">高代价补救</option>
+              <option value="early">提前布局</option>
+              <option value="close">已关闭</option>
+            </select>
+          </label>
+          <label class="field">
+            <span class="meta-label">排序</span>
+            <select id="sortSelect">
+              <option value="priority">优先级</option>
+              <option value="close">关闭年龄优先</option>
+              <option value="lock">锁死强度优先</option>
+              <option value="category">维度优先</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <div class="hero-actions">
+        <button class="btn primary" id="resetBtn" type="button">重置筛选</button>
+        <label class="switcher" for="lockOnly">
+          <input id="lockOnly" type="checkbox" />
+          <span>只看高锁死窗口（>=80%）</span>
+        </label>
       </div>
-    </div>
+    </header>
+
+    <section class="kpi-grid" id="kpiGrid" aria-live="polite"></section>
+
+    <main class="content-grid">
+      <section class="panel">
+        <div class="panel-head">
+          <h2>高优先窗口</h2>
+          <p>当前最值得立即决策的窗口</p>
+        </div>
+        <div id="focusList" class="focus-list"></div>
+      </section>
+
+      <section class="panel wide">
+        <div class="panel-head">
+          <h2>密集决策表</h2>
+          <p id="resultStat"></p>
+        </div>
+        <div id="denseList" class="dense-list" role="list"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>维度热力</h2>
+          <p>各领域当前压力占比</p>
+        </div>
+        <div id="dimensionGrid" class="dimension-grid"></div>
+      </section>
+    </main>
   </div>
 
-  <div class="max-w-6xl mx-auto px-6 py-8">
-    <!-- 顶部说明 -->
-    <div class="text-center mb-8 animate-fadeIn">
-      <p class="subtitle mb-2">拖动年龄滑块，探索不同阶段的人生窗口</p>
-      <div class="flex justify-center gap-8 text-xs text-gray-400">
-        <span class="flex items-center gap-1">
-          <div class="w-2 h-2 rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500"></div>
-          </span>
-        <span>现在该做的事</span>
-        <span class="flex items-center gap-1">
-          <div class="w-2 h-2 rounded-full bg-gradient-to-r from-amber-400 to-amber-500"></div>
-        </span>
-        <span class="flex items-center gap-1">
-          <div class="w-2 h-2 rounded-full bg-gradient-to-r from-violet-400 to-violet-500"></div>
-        </span>
-        <span class="flex items-center gap-1">
-          <div class="w-2 h-2 rounded-full bg-gradient-to-r from-slate-400 to-slate-500"></div>
-        </span>
-      </div>
-    </div>
+  <section id="detailPanel" class="detail-panel" aria-hidden="true">
+    <article class="detail-card">
+      <button id="detailClose" class="detail-close" type="button" aria-label="关闭">×</button>
+      <div id="detailContent"></div>
+    </article>
+  </section>
 
-    <!-- 黄金期 - 最重要的 -->
-    <div id="goldSection" class="mb-12 animate-fadeIn">
-      <div class="flex items-center gap-3 mb-6">
-        <div class="w-10 h-10 rounded-2xl flex items-center justify-center animate-[float_3s_linear_infinite]">
-          <span class="text-3xl">✨</span>
-        </div>
-        <h2 class="text-2xl font-bold text-gray-800 title-serif">现在该做的事 <span class="text-sm font-normal text-emerald-600 ml-2" id="goldCount">(0个)</span></h2>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="goldCards"></div>
-    </div>
-
-    <!-- 即将关闭 - 紧急 -->
-    <div id="warningSection" class="mb-12 animate-fadeIn">
-      <div class="flex items-center gap-3 mb-6">
-        <div class="w-10 h-10 rounded-2xl flex items-center justify-center bg-gradient-to-r from-amber-400 to-orange-500 shadow-lg animate-[breathe_2s_ease-in-out_infinite]">
-          <span class="text-3xl text-white">⚠️</span>
-        </div>
-        <h2 class="text-2xl font-bold text-amber-600 title-serif">快来不及了 <span class="text-sm font-normal text-amber-700 ml-2" id="warningCount">(0个)</span></h2>
-        <p class="subtitle text-amber-700">这些窗口即将关闭，请尽快行动</p>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="warningCards"></div>
-    </div>
-
-    <!-- 即将开启 - 规划 -->
-    <div id="earlySection" class="mb-12 animate-fadeIn">
-      <div class="flex items-center gap-3 mb-6">
-        <div class="w-10 h-10 rounded-2xl flex items-center justify-center bg-gradient-to-r from-violet-400 to-purple-500">
-          <span class="text-3xl text-white">🔮</span>
-        </div>
-        <h2 class="text-2xl font-bold text-violet-600 title-serif">即将开启 <span class="text-sm font-normal text-violet-700 ml-2" id="earlyCount">(0个)</span></h2>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="earlyCards"></div>
-    </div>
-
-    <!-- 已错失 - 错失的窗口 -->
-    <div id="closeSection" class="mb-12 animate-fadeIn">
-      <div class="flex items-center gap-3 mb-6">
-        <div class="w-10 h-10 rounded-2xl flex items-center justify-center bg-gradient-to-r from-slate-400 to-slate-600">
-          <span class="text-3xl text-white">💔</span>
-        </div>
-        <h2 class="text-2xl font-bold text-slate-600 title-serif">已错失的窗口 <span class="text-sm font-normal text-slate-700 ml-2" id="closeCount">(0个)</span></h2>
-        <p class="subtitle text-slate-600">这些窗口已关闭，但值得了解</p>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="closeCards"></div>
-    </div>
-
-    <!-- 维度概览 -->
-    <div class="bg-white rounded-3xl p-8 shadow-xl glass-panel mb-12 animate-fadeIn">
-      <h3 class="section-title mb-6">各维度完成度</h3>
-      <div class="grid grid-cols-3 md:grid-cols-6 gap-6" id="radarGrid"></div>
-    </div>
-  </div>
-
-  <!-- 详情弹窗 -->
-  <div class="modal-mask fixed inset-0 z-[50] hidden items-center justify-center p-4 modal-backdrop" id="modalMask">
-    <div class="modal-content bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl animate-fadeIn" id="modalContent"></div>
-  </div>
-
-  <!-- 数据 + 主应用 JS -->
-  <script src="assets/js/data.js"></script>
+  <script src="assets/js/data-full.js"></script>
   <script src="assets/js/app.js"></script>
 </body>
 </html>
