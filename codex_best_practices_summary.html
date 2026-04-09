@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Codex 最佳实践重点总结</title>
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --card: #ffffff;
+      --text: #18212f;
+      --muted: #5f6b7a;
+      --line: #e6ebf2;
+      --primary: #2563eb;
+      --primary-soft: #eff6ff;
+      --good: #0f766e;
+      --good-soft: #ecfeff;
+      --warn: #b45309;
+      --warn-soft: #fff7ed;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: linear-gradient(180deg, #f8fbff 0%, var(--bg) 100%);
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    .container {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 28px 20px 80px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 42%, #0ea5e9 100%);
+      color: white;
+      border-radius: 28px;
+      padding: 36px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -80px;
+      top: -80px;
+      width: 260px;
+      height: 260px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 50%;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.14);
+      font-size: 13px;
+      letter-spacing: .3px;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 5vw, 48px);
+      line-height: 1.15;
+    }
+
+    .subtitle {
+      margin-top: 14px;
+      max-width: 860px;
+      font-size: 18px;
+      color: rgba(255,255,255,0.92);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 26px;
+    }
+
+    .hero-stat {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 18px;
+      padding: 16px;
+      backdrop-filter: blur(8px);
+    }
+
+    .hero-stat b {
+      display: block;
+      font-size: 22px;
+      margin-bottom: 4px;
+    }
+
+    .section {
+      margin-top: 24px;
+    }
+
+    .section-title {
+      font-size: 24px;
+      margin: 0 0 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+
+    .highlight {
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      border-left: 6px solid var(--primary);
+    }
+
+    .big-quote {
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.45;
+      margin: 0;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .practice-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .practice {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .practice .num {
+      width: 34px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .practice h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .practice p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .callout {
+      border-radius: 18px;
+      padding: 18px;
+      margin-top: 16px;
+    }
+
+    .good { background: var(--good-soft); border: 1px solid #bae6fd; }
+    .warn { background: var(--warn-soft); border: 1px solid #fed7aa; }
+
+    .callout h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+    }
+
+    .callout ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .step {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      position: relative;
+    }
+
+    .step small {
+      display: inline-block;
+      font-weight: 800;
+      color: var(--primary);
+      background: var(--primary-soft);
+      border-radius: 999px;
+      padding: 6px 10px;
+      margin-bottom: 10px;
+    }
+
+    .step h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .step p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .footer {
+      margin-top: 26px;
+      color: var(--muted);
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .checklist {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+    }
+
+    .source-box {
+      font-size: 14px;
+      color: var(--muted);
+      background: #fbfdff;
+    }
+
+    @media (max-width: 980px) {
+      .grid, .practice-list, .steps, .hero-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="hero">
+      <div class="eyebrow">OpenAI Codex · 最佳实践重点版</div>
+      <h1>Codex 最佳实践到底讲了什么？</h1>
+      <p class="subtitle">
+        核心不是“神奇 prompt”，而是把 Codex 当成一个工程代理来使用：给它清晰任务边界、稳定上下文、可执行环境，以及能复用的工作流。
+      </p>
+
+      <div class="hero-grid">
+        <div class="hero-stat">
+          <b>先计划</b>
+          <span>大任务先 Ask，再进入 Code</span>
+        </div>
+        <div class="hero-stat">
+          <b>强上下文</b>
+          <span>像写 GitHub Issue 一样描述问题</span>
+        </div>
+        <div class="hero-stat">
+          <b>可复用</b>
+          <span>把经验沉淀成 AGENTS.md 与 Skills</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section grid">
+      <div class="card highlight">
+        <h2 class="section-title">一句话总结</h2>
+        <p class="big-quote">
+          不要把 Codex 当成“会写代码的聊天机器人”，而要把它当成“需要清晰输入、稳定环境和明确约束的工程代理”。
+        </p>
+        <div class="pill-row">
+          <span class="pill">任务要小而清晰</span>
+          <span class="pill">上下文要结构化</span>
+          <span class="pill">环境要可执行</span>
+          <span class="pill">流程要能复用</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title">最重要的三个变化</h2>
+        <ul class="checklist">
+          <li>从“我问一句，你答一句”转向“我定义任务，你自主执行”。</li>
+          <li>从“单次 prompt 技巧”转向“仓库上下文工程”。</li>
+          <li>从“临时辅助”转向“标准化工作流与自动化”。</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">7 条最佳实践</h2>
+      <div class="practice-list">
+        <article class="practice">
+          <div class="num">1</div>
+          <h3>大改动先 Ask Mode，再 Code Mode</h3>
+          <p>先让 Codex 输出实现计划、改动范围、风险点和验收方式，再让它真正改代码，能显著减少跑偏。</p>
+        </article>
+
+        <article class="practice">
+          <div class="num">2</div>
+          <h3>把任务控制在“小而明确”的范围</h3>
+          <p>更适合 1 小时级、几百行量级的问题。任务越聚焦，结果越稳定，回滚和验证也越容易。</p>
+        </article>
+
+        <article class="practice">
+          <div class="num">3</div>
+          <h3>提示词像 GitHub Issue，不要像随口聊天</h3>
+          <p>明确目标、文件路径、参考实现、约束条件、不能动的内容、验收标准，才能让代理真正理解任务边界。</p>
+        </article>
+
+        <article class="practice">
+          <div class="num">4</div>
+          <h3>在仓库里维护 AGENTS.md</h3>
+          <p>把命名规范、测试命令、业务规则、坑点、依赖关系、提交约定写进去，这些往往比“模型更聪明”更重要。</p>
+        </article>
+
+        <article class="practice">
+          <div class="num">5</div>
+          <h3>把重复工作沉淀成 Skills</h3>
+          <p>例如：日志排查、故障摘要、PR 检查、迁移脚本生成、标准调试流程。不要每次都重写一大段 prompt。</p>
+        </article>
+
+        <article class="practice">
+          <div class="num">6</div>
+          <h3>工具接入先少而精</h3>
+          <p>先接 1～2 个真正高频、能打通流程的工具，不要一上来把所有工具全接上，否则复杂度会迅速失控。</p>
+        </article>
+
+        <article class="practice">
+          <div class="num">7</div>
+          <h3>把稳定流程自动化</h3>
+          <p>当一个工作流已经跑顺，就把它做成自动化流程，例如定时巡检、日报、异常摘要、回归检查。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section grid">
+      <div class="card">
+        <h2 class="section-title">官方背后的真正意思</h2>
+        <div class="callout good">
+          <h3>它在鼓励什么？</h3>
+          <ul>
+            <li>把知识从“人脑经验”转成“仓库可读上下文”</li>
+            <li>把一次性操作转成可复用流程</li>
+            <li>把模糊需求转成可执行规格</li>
+            <li>把 AI 使用从个人技巧升级成团队工程能力</li>
+          </ul>
+        </div>
+
+        <div class="callout warn">
+          <h3>它不建议什么？</h3>
+          <ul>
+            <li>把超大、超模糊、跨很多系统的任务一次性丢给 Codex</li>
+            <li>只靠聊天式 prompt，而不补充项目上下文</li>
+            <li>没有测试、没有脚本、没有约束就让 AI 直接大改代码</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title">对后端团队最有价值的启发</h2>
+        <ul class="checklist">
+          <li>重点不是“会不会写 prompt”，而是代码仓是否适合 AI 理解和执行。</li>
+          <li>团队最佳实践要文档化，否则每个人都在重复试错。</li>
+          <li>AI 转型的核心抓手，是“上下文工程 + 工作流工程 + 自动化”。</li>
+          <li>旧仓库要补：启动脚本、测试入口、模块边界、业务规则说明、样例数据。</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">团队落地动作（适合 10 人后端团队）</h2>
+      <div class="steps">
+        <div class="step">
+          <small>动作 01</small>
+          <h3>补仓库说明层</h3>
+          <p>在根目录补 AGENTS.md、README、模块说明、测试命令、常见坑，先解决“AI 看不懂仓库”的问题。</p>
+        </div>
+
+        <div class="step">
+          <small>动作 02</small>
+          <h3>需求模板化</h3>
+          <p>把需求描述统一成 Issue 模板：背景、目标、约束、影响范围、验收标准、回滚方案。</p>
+        </div>
+
+        <div class="step">
+          <small>动作 03</small>
+          <h3>沉淀高频 Skills</h3>
+          <p>先挑 3 类高频任务：故障排查、PR 审查、脚本生成。做成标准 skill，减少每次重复沟通成本。</p>
+        </div>
+
+        <div class="step">
+          <small>动作 04</small>
+          <h3>从小任务试点</h3>
+          <p>不要先上核心主链路改造。先从测试补齐、接口小改、日志增强、SQL 优化等任务切入。</p>
+        </div>
+
+        <div class="step">
+          <small>动作 05</small>
+          <h3>建立验证闭环</h3>
+          <p>让每次 AI 产出都能被 lint、单测、回归脚本、评审 checklist 验证，而不是只靠肉眼看代码。</p>
+        </div>
+
+        <div class="step">
+          <small>动作 06</small>
+          <h3>对成熟流程做自动化</h3>
+          <p>把日报、巡检、异常总结、代码扫描等成熟工作流自动触发，放大团队单位时间产出。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="card source-box">
+        <h2 class="section-title">信息来源</h2>
+        <p>
+          本页内容基于 OpenAI 官方关于 Codex 的最佳实践与使用经验总结，重点做了中文提炼与团队落地化重组。
+        </p>
+      </div>
+    </section>
+
+    <div class="footer">
+      这是一页适合快速浏览的重点版。如果继续扩展，可以再加：团队 OKR、仓库改造清单、AI 转型成熟度模型。
+    </div>
+  </div>
+</body>
+</html>

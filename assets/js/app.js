@@ -1,362 +1,445 @@
-// 人生时间窗口导航系统 - 重新设计，围绕核心关注点
-
-let currentAge = 30;
-let currentView = 'gold';
-let networkSim = null;
-
-const ageSlider = document.getElementById('ageSlider');
-const ageDisplay = document.getElementById('ageDisplay');
-const modalMask = document.getElementById('modalMask');
-const modalContent = document.getElementById('modalContent');
-const goldCards = document.getElementById('goldCards');
-const warningCards = document.getElementById('warningCards');
-const earlyCards = document.getElementById('earlyCards');
-const closeCards = document.getElementById('closeCards');
-const goldCount = document.getElementById('goldCount');
-const warningCount = document.getElementById('warningCount');
-const earlyCount = document.getElementById('earlyCount');
-const closeCount = document.getElementById('closeCount');
-const radarGrid = document.getElementById('radarGrid');
-
-function getWindowStatus(w, age) {
-  if (age < w.earlyRiskEnd) return { status: 'early', label: '即将开启', color: 'bg-purple-100 text-purple-700', dot: 'bg-purple-400', border: 'border-purple-400' };
-  if (age >= w.goldStart && age <= w.goldEnd) return { status: 'gold', label: '黄金期', color: 'bg-sky-100 text-sky-700', dot: 'bg-sky-500', border: 'border-sky-500' };
-  if (age > w.goldEnd && age <= w.lateRiskEnd) return { status: 'warning', label: '即将关闭', color: 'bg-amber-100 text-amber-700', dot: 'bg-amber-500', border: 'border-amber-500' };
-  if (age > w.lateRiskEnd && age <= w.closeAge) return { status: 'risk', label: '高代价补救', color: 'bg-red-100 text-red-700', dot: 'bg-red-500', border: 'border-red-500' };
-  return { status: 'close', label: '已关闭', color: 'bg-gray-100 text-gray-700', dot: 'bg-gray-400', border: 'border-gray-300' };
+const WINDOW_DATA = typeof windowData === "undefined" ? [] : windowData;
+if (!Array.isArray(WINDOW_DATA) || WINDOW_DATA.length === 0) {
+  const root = document.querySelector(".app-shell");
+  if (root) {
+    root.innerHTML = "<p style='padding:20px;color:#a8bad3'>未检测到数据文件 data-full.js。</p>";
+  }
+  throw new Error("windowData is missing.");
 }
 
-function costLabel(level) {
-  const map = { Low: '低', Medium: '中', High: '高', Extreme: '极高' };
-  return map[level] || level;
+const state = {
+  age: 30,
+  query: "",
+  category: "all",
+  status: "all",
+  sort: "priority",
+  lockOnly: false,
+};
+
+const CATEGORY_META = {
+  health: { label: "生理健康", icon: "体" },
+  career: { label: "学业职业", icon: "职" },
+  finance: { label: "财富资产", icon: "财" },
+  relation: { label: "亲密家庭", icon: "家" },
+  spirit: { label: "精神成长", icon: "心" },
+  risk: { label: "风险兜底", icon: "护" },
+};
+
+const STATUS_META = {
+  gold: { label: "现在做", cls: "gold" },
+  warning: { label: "快关闭", cls: "warn" },
+  risk: { label: "高代价补救", cls: "risk" },
+  early: { label: "提前布局", cls: "early" },
+  close: { label: "已关闭", cls: "close" },
+};
+
+const els = {
+  ageValue: document.getElementById("ageValue"),
+  lifeStage: document.getElementById("lifeStage"),
+  ageSlider: document.getElementById("ageSlider"),
+  ageChips: document.querySelectorAll(".age-chip"),
+  searchInput: document.getElementById("searchInput"),
+  categorySelect: document.getElementById("categorySelect"),
+  statusSelect: document.getElementById("statusSelect"),
+  sortSelect: document.getElementById("sortSelect"),
+  lockOnly: document.getElementById("lockOnly"),
+  resetBtn: document.getElementById("resetBtn"),
+  kpiGrid: document.getElementById("kpiGrid"),
+  focusList: document.getElementById("focusList"),
+  denseList: document.getElementById("denseList"),
+  dimensionGrid: document.getElementById("dimensionGrid"),
+  resultStat: document.getElementById("resultStat"),
+  detailPanel: document.getElementById("detailPanel"),
+  detailClose: document.getElementById("detailClose"),
+  detailContent: document.getElementById("detailContent"),
+};
+
+function clampText(value, maxLength) {
+  if (!value) return "";
+  const v = String(value);
+  return v.length <= maxLength ? v : `${v.slice(0, maxLength)}...`;
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 function getLifeStage(age) {
-  if (age < 6) return '幼儿期';
-  if (age < 12) return '童年期';
-  if (age < 18) return '青春期';
-  if (age < 22) return '学生期';
-  if (age < 28) return '职场新人期';
-  if (age < 35) return '成家立业期';
-  if (age < 45) return '中年稳定期';
-  if (age < 55) return '中年转型期';
-  if (age < 65) return '退休预备期';
-  return '退休期';
+  if (age < 6) return "幼儿期";
+  if (age < 12) return "童年期";
+  if (age < 18) return "青春期";
+  if (age < 25) return "学生期";
+  if (age < 35) return "起步期";
+  if (age < 45) return "成长期";
+  if (age < 55) return "稳态期";
+  if (age < 65) return "跃迁前夜";
+  return "成熟期";
 }
 
-function renderCard(w) {
-  const s = getWindowStatus(w, currentAge);
-  const catIcons = { health: '❤️', career: '💼', finance: '💰', relation: '💕', spirit: '🧠', risk: '🛡️' };
-  const catLabels = { health: '健康', career: '职业', finance: '财富', relation: '家庭', spirit: '成长', risk: '风险' };
-
-  let html = '';
-  html += '<div class="bg-white rounded-xl p-4 shadow-sm hover:shadow-md cursor-pointer border-l-4 ' + s.border + ' transition-all" data-id="' + w.id + '">';
-  html += '<div class="flex items-center justify-between mb-3">';
-  html += '<div class="flex items-center gap-2">';
-  html += '<span class="text-xl">' + (catIcons[w.category] || '📋') + '</span>';
-  html += '<span class="px-2 py-0.5 rounded text-xs font-medium ' + s.color + '">' + s.label + '</span>';
-  html += '</div>';
-  html += '<span class="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">' + w.goldStart + '-' + w.goldEnd + '岁</span>';
-  html += '</div>';
-  html += '<h3 class="text-base font-semibold text-gray-800 mb-2 truncate">' + w.title + '</h3>';
-  html += '<p class="text-sm text-gray-500 line-clamp-2">' + w.desc + '</p>';
-  html += '</div>';
-  return html;
+function getWindowStatus(item, age) {
+  if (age < item.earlyRiskEnd) return "early";
+  if (age >= item.goldStart && age <= item.goldEnd) return "gold";
+  if (age > item.goldEnd && age <= item.lateRiskEnd) return "warning";
+  if (age > item.lateRiskEnd && age <= item.closeAge) return "risk";
+  return "close";
 }
 
-function renderAllCards() {
-  const gold = windowData.filter(function(w) {
-    const s = getWindowStatus(w, currentAge);
-    return s.status === 'gold';
-  }).sort(function(a, b) { return b.lockForce - a.lockForce; });
+function getStatusReason(item, age) {
+  const status = getWindowStatus(item, age);
+  if (status === "gold") {
+    return "现在执行最有价值，建议先做最小可交付动作。";
+  }
+  if (status === "warning") {
+    return `临近关闭，距离 ${item.closeAge} 岁仅余 ${Math.max(item.closeAge - age, 0)} 年。`;
+  }
+  if (status === "risk") {
+    return "已过黄金期，后续修复成本高，注意先控制边界后再投入。";
+  }
+  if (status === "early") {
+    return `未到黄金期，距离启动窗口开始还有 ${Math.max(item.goldStart - age, 0)} 年。`;
+  }
+  return "已基本封闭，建议调整资源去向其他窗口。";
+}
 
-  const warning = windowData.filter(function(w) {
-    const s = getWindowStatus(w, currentAge);
-    return s.status === 'warning' || s.status === 'risk';
-  }).sort(function(a, b) { return b.lockForce - a.lockForce; });
+function getUrgencyScore(item, age) {
+  const status = getWindowStatus(item, age);
+  const statusBase = status === "gold" ? 400 : status === "warning" ? 320 : status === "risk" ? 270 : status === "early" ? 180 : 90;
+  const closeGap = Math.max(item.closeAge - age, 0);
+  return statusBase + item.lockForce - closeGap * 0.9 + (item.goldEnd - item.goldStart);
+}
 
-  const early = windowData.filter(function(w) {
-    const s = getWindowStatus(w, currentAge);
-    return s.status === 'early';
-  }).sort(function(a, b) { return a.goldStart - b.goldStart; });
-
-  const close = windowData.filter(function(w) {
-    const s = getWindowStatus(w, currentAge);
-    return s.status === 'close';
-  }).sort(function(a, b) { return b.lockForce - a.lockForce; });
-
-  goldCards.innerHTML = gold.map(renderCard).join('');
-  warningCards.innerHTML = warning.map(renderCard).join('');
-  earlyCards.innerHTML = early.map(renderCard).join('');
-  closeCards.innerHTML = close.map(renderCard).join('');
-
-  goldCount.textContent = '(' + gold.length + '个)';
-  warningCount.textContent = '(' + warning.length + '个)';
-  earlyCount.textContent = '(' + early.length + '个)';
-  closeCount.textContent = '(' + close.length + '个)';
-
-  document.querySelectorAll('[data-id]').forEach(function(el) {
-    el.addEventListener('click', function() { openModal(el.dataset.id); });
+function getFilteredData() {
+  return WINDOW_DATA.filter((item) => {
+    const status = getWindowStatus(item, state.age);
+    const text = `${item.title} ${item.desc} ${item.categoryName} ${item.source} ${item.actionList.join(" ")}`.toLowerCase();
+    const matchesQuery = !state.query || text.includes(state.query);
+    const matchesCategory = state.category === "all" || item.category === state.category;
+    const matchesStatus =
+      state.status === "all" || status === state.status || (state.status === "warning" && status === "risk");
+    const matchesLock = !state.lockOnly || item.lockForce >= 80;
+    return matchesQuery && matchesCategory && matchesStatus && matchesLock;
   });
 }
 
-function renderRadar() {
-  const dims = [
-    { key: 'health', name: '健康', icon: '❤️' },
-    { key: 'career', name: '职业', icon: '💼' },
-    { key: 'finance', name: '财富', icon: '💰' },
-    { key: 'relation', name: '家庭', icon: '💕' },
-    { key: 'spirit', name: '成长', icon: '🧠' },
-    { key: 'risk', name: '风险', icon: '🛡️' }
+function sortItems(items) {
+  const result = [...items];
+  if (state.sort === "close") {
+    return result.sort((a, b) => a.closeAge - b.closeAge || getUrgencyScore(b, state.age) - getUrgencyScore(a, state.age));
+  }
+  if (state.sort === "lock") {
+    return result.sort((a, b) => b.lockForce - a.lockForce || a.closeAge - b.closeAge);
+  }
+  if (state.sort === "category") {
+    return result.sort((a, b) => a.category.localeCompare(b.category) || getUrgencyScore(b, state.age) - getUrgencyScore(a, state.age));
+  }
+  return result.sort((a, b) => getUrgencyScore(b, state.age) - getUrgencyScore(a, state.age));
+}
+
+function computeCounts(items) {
+  const groups = { all: items.length, gold: 0, warning: 0, risk: 0, early: 0, close: 0 };
+  items.forEach((item) => {
+    const status = getWindowStatus(item, state.age);
+    groups[status] += 1;
+  });
+  groups.warning = groups.warning + groups.risk;
+  return groups;
+}
+
+function makeBadge(status) {
+  const meta = STATUS_META[status];
+  return `<span class="badge ${meta.cls}">${meta.label}</span>`;
+}
+
+function renderKpi(items) {
+  const stats = computeCounts(getFilteredData());
+  const focus = items.filter((item) => getWindowStatus(item, state.age) === "gold").length;
+  const lockHeavy = items.filter((item) => item.lockForce >= 80).length;
+  const urgent = items.filter((item) => {
+    const status = getWindowStatus(item, state.age);
+    return status === "warning" || status === "risk";
+  }).length;
+
+  const cards = [
+    { title: "筛选结果", value: String(items.length), note: "命中窗口" },
+    { title: "现在做", value: String(stats.gold), note: "优先执行" },
+    { title: "快关闭", value: String(urgent), note: "即将收口" },
+    { title: "高锁死", value: String(lockHeavy), note: "锁定成本高" },
+    { title: "黄金待发", value: String(focus), note: "可快速增益" },
   ];
 
-  let html = '';
-  dims.forEach(function(d) {
-    const ws = windowData.filter(function(w) { return w.category === d.key; });
-    let done = 0;
-    ws.forEach(function(w) {
-      const s = getWindowStatus(w, currentAge);
-      if (s.status === 'gold' || s.status === 'close') done++;
-    });
-    const pct = Math.round((done / ws.length) * 100) || 0;
-    const total = ws.length;
-
-    html += '<div class="text-center">';
-    html += '<div class="h-14 flex items-end justify-center mb-1">';
-    html += '<div class="w-4 bg-sky-500 rounded-t transition-all" style="height:' + pct + '%"></div>';
-    html += '</div>';
-    html += '<div class="text-lg font-bold text-sky-600">' + pct + '%</div>';
-    html += '<div class="text-xs text-gray-500">' + d.name + '</div>';
-    html += '<div class="text-[10px] text-gray-400">' + done + '/' + total + '</div>';
-    html += '</div>';
-  });
-  radarGrid.innerHTML = html;
+  els.kpiGrid.innerHTML = cards
+    .map(
+      (card) => `
+      <article class="kpi-item">
+        <h3>${escapeHtml(card.title)}</h3>
+        <strong>${escapeHtml(card.value)}</strong>
+        <p>${escapeHtml(card.note)}</p>
+      </article>
+    `
+    )
+    .join("");
 }
 
-function openModal(id) {
-  const w = windowData.find(function(x) { return x.id == id; });
-  if (!w) return;
-
-  const s = getWindowStatus(w, currentAge);
-  const totalAge = Math.max(w.closeAge + 5, 80);
-  const goldLeft = (w.goldStart / totalAge * 100).toFixed(1);
-  const goldWidth = ((w.goldEnd - w.goldStart) / totalAge * 100).toFixed(1);
-  const currentLeft = (currentAge / totalAge * 100).toFixed(1);
-
-  const advice = {
-    gold: '当前处于黄金执行期，现在行动ROI最高，优先投入资源。',
-    warning: '窗口即将关闭，剩余时间有限，尽快启动补救行动。',
-    risk: '已进入高代价补救期，行动成本上升，但仍有机会，不要放弃。',
-    early: '尚未到最优执行期，提前行动有代价，建议先了解、做准备，不要盲目投入。',
-    close: '窗口已关闭，此项基本不可逆，接受现状，聚焦仍开放的窗口。'
-  }[s.status] || '';
-
-  const catIcons = { health: '❤️', career: '💼', finance: '💰', relation: '💕', spirit: '🧠', risk: '🛡️' };
-  const catLabels = { health: '健康', career: '职业', finance: '财富', relation: '家庭', spirit: '成长', risk: '风险' };
-
-  let html = '';
-  html += '<div class="flex justify-between items-center p-5 border-b border-gray-100">';
-  html += '<div class="flex-1">';
-  html += '<div class="flex items-center gap-3 mb-2">';
-  html += '<span class="text-3xl">' + (catIcons[w.category] || '📋') + '</span>';
-  html += '<span class="px-3 py-1.5 rounded-lg text-sm font-medium ' + s.color + '">' + s.label + '</span>';
-  html += '<span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">' + catLabels[w.category] + '</span>';
-  html += '</div>';
-  html += '<h2 class="text-xl font-bold text-gray-800">' + w.title + '</h2>';
-  html += '</div>';
-  html += '<button class="text-3xl text-gray-400 hover:text-gray-600 close-btn">×</button>';
-  html += '</div>';
-
-  html += '<div class="tabs tabs-boxed px-5 pt-4">';
-  html += '<a class="tab tab-active text-sm" data-tab="overview">概览</a>';
-  html += '<a class="tab text-sm" data-tab="actions">行动建议</a>';
-  html += '</div>';
-
-  html += '<div class="flex-1 overflow-y-auto">';
-
-  html += '<div class="modal-section p-5" data-section="overview">';
-  if (advice) {
-    html += '<div class="mb-5 p-4 bg-green-50 border-l-4 border-green-500 rounded-lg text-sm text-green-800">' + advice + '</div>';
-  }
-  html += '<div class="mb-5 p-4 bg-gray-50 rounded-xl">';
-  html += '<h4 class="text-sm font-semibold text-gray-800 mb-3">时间窗口周期</h4>';
-  html += '<div class="h-10 bg-gray-200 rounded-lg relative mb-4">';
-  html += '<div class="absolute top-1/2 -translate-y-1/2 h-5 bg-sky-500 rounded-lg" style="left:' + goldLeft + '%;width:' + goldWidth + '%"></div>';
-  html += '<div class="absolute top-0 w-0.5 h-10 bg-red-500" style="left:' + currentLeft + '%"></div>';
-  html += '</div>';
-  html += '<div class="grid grid-cols-3 gap-3 text-center">';
-  html += '<div class="bg-white p-3 rounded-lg"><div class="text-sm text-gray-500 mb-1">开启</div><div class="text-lg font-bold text-gray-800">' + w.goldStart + '岁</div></div>';
-  html += '<div class="bg-white p-3 rounded-lg"><div class="text-sm text-gray-500 mb-1">黄金期</div><div class="text-lg font-bold text-sky-600">' + w.goldStart + '-' + w.goldEnd + '岁</div></div>';
-  html += '<div class="bg-white p-3 rounded-lg"><div class="text-sm text-gray-500 mb-1">关闭</div><div class="text-lg font-bold text-gray-800">' + w.closeAge + '岁</div></div>';
-  html += '</div>';
-  html += '</div>';
-
-  html += '<div class="grid grid-cols-2 gap-4 mb-5">';
-  html += '<div class="p-4 bg-yellow-50 rounded-xl border border-yellow-200">';
-  html += '<h5 class="text-sm font-medium text-gray-700 mb-2">提前代价</h5>';
-  html += '<div class="text-3xl font-bold text-yellow-600 mb-1">' + costLabel(w.earlyCost) + '</div>';
-  html += '<div class="text-sm text-gray-600">' + w.earlyCostDesc + '</div>';
-  html += '</div>';
-  html += '<div class="p-4 bg-red-50 rounded-xl border border-red-200">';
-  html += '<h5 class="text-sm font-medium text-gray-700 mb-2">滞后代价</h5>';
-  html += '<div class="text-3xl font-bold text-red-600 mb-1">' + costLabel(w.lateCost) + '</div>';
-  html += '<div class="text-sm text-gray-600">' + w.lateCostDesc + '</div>';
-  html += '</div>';
-  html += '</div>';
-
-  html += '<div class="grid grid-cols-3 gap-4 mb-5">';
-  html += '<div class="p-4 bg-sky-50 rounded-xl text-center border border-sky-200">';
-  html += '<div class="text-4xl font-bold text-sky-600 mb-1">' + w.lockForce + '%</div>';
-  html += '<div class="text-sm text-gray-500">锁死强制力</div>';
-  html += '</div>';
-  html += '<div class="p-4 bg-purple-50 rounded-xl text-center border border-purple-200">';
-  html += '<div class="text-xl font-bold text-purple-600 mb-1">' + catLabels[w.category] + '</div>';
-  html += '<div class="text-sm text-gray-500">所属维度</div>';
-  html += '</div>';
-  html += '<div class="p-4 bg-white rounded-xl border border-gray-200">';
-  html += '<h5 class="text-sm font-medium text-gray-700 mb-2">关键数据</h5>';
-  html += '<div class="text-sm text-gray-600 space-y-1">';
-  html += '<div>禁忌期: 0-' + w.earlyRiskEnd + '岁</div>';
-  html += '<div>黄金期: ' + w.goldStart + '-' + w.goldEnd + '岁</div>';
-  html += '<div>补救期: ' + w.goldEnd + '-' + w.lateRiskEnd + '岁</div>';
-  html += '<div>关闭: ' + w.closeAge + '岁后</div>';
-  html += '</div>';
-  html += '</div>';
-  html += '</div>';
-
-  html += '<div class="p-4 bg-gray-50 rounded-xl border border-gray-200 text-sm">';
-  html += '<div class="font-semibold text-gray-800 mb-1">📚 科学依据</div>';
-  html += '<div class="text-gray-600">' + w.source + '</div>';
-  html += '</div>';
-
-  html += '</div>';
-
-  html += '<div class="modal-section hidden p-5" data-section="actions">';
-  html += '<h4 class="text-sm font-semibold text-gray-800 mb-4">📋 行动建议</h4>';
-  html += '<ul class="space-y-3">';
-  w.actionList.forEach(function(a) {
-    html += '<li class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg text-sm">';
-    html += '<span class="text-green-500 font-bold text-lg">✓</span>';
-    html += '<span class="flex-1">' + a + '</span>';
-    html += '</li>';
-  });
-  html += '</ul>';
-  if (advice) {
-    html += '<div class="mt-5 p-4 bg-amber-50 border-l-4 border-amber-500 rounded-lg text-sm text-amber-800">' + advice + '</div>';
-  }
-  html += '</div>';
-
-  html += '</div>';
-
-  modalContent.innerHTML = html;
-  modalMask.classList.remove('hidden');
-  modalMask.classList.add('flex');
-
-  document.querySelectorAll('.tab').forEach(function(tab) {
-    tab.addEventListener('click', function() {
-      document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('tab-active'); });
-      document.querySelectorAll('.modal-section').forEach(function(s) { s.classList.add('hidden'); });
-      tab.classList.add('tab-active');
-      document.querySelector('[data-section="' + tab.dataset.tab + '"]').classList.remove('hidden');
-    });
-  });
-
-  document.querySelector('.close-btn').addEventListener('click', closeModal);
-}
-
-function closeModal() {
-  modalMask.classList.remove('flex');
-  modalMask.classList.add('hidden');
-}
-
-modalMask.addEventListener('click', function(e) {
-  if (e.target === modalMask) closeModal();
-});
-
-function updateAll() {
-  renderAllCards();
-  renderRadar();
-}
-
-function initApp() {
-  console.log('initApp() called');
-  console.log('DOM elements check:');
-  console.log('ageSlider:', ageSlider);
-  console.log('ageDisplay:', ageDisplay);
-  console.log('goldCards:', goldCards);
-  console.log('warningCards:', warningCards);
-  console.log('earlyCards:', earlyCards);
-  console.log('windowData:', typeof windowData, windowData ? windowData.length : 'undefined');
-
-  if (!ageSlider) {
-    console.error('ageSlider not found!');
+function renderFocus(items) {
+  const focusItems = [...items].sort((a, b) => getUrgencyScore(b, state.age) - getUrgencyScore(a, state.age)).slice(0, 4);
+  if (!focusItems.length) {
+    els.focusList.innerHTML = `<p class="empty-state">暂无可展示的高优先窗口。</p>`;
     return;
   }
 
-  ageSlider.addEventListener('input', function(e) {
-    currentAge = parseInt(e.target.value);
-    ageDisplay.textContent = currentAge;
-    updateAll();
-  });
-
-  document.querySelectorAll('.quick-jump').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      document.querySelectorAll('.quick-jump').forEach(function(b) { b.classList.remove('active', 'btn-primary'); b.classList.add('btn-ghost'); });
-      btn.classList.add('active', 'btn-primary');
-      btn.classList.remove('btn-ghost');
-      currentAge = parseInt(btn.dataset.age);
-      ageSlider.value = currentAge;
-      ageDisplay.textContent = currentAge;
-      updateAll();
-    });
-  });
-
-  document.querySelectorAll('.status-filter-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      const status = btn.dataset.status;
-      currentView = status;
-      document.querySelectorAll('.status-filter-btn').forEach(function(b) {
-        b.classList.remove('ring-2', 'ring-offset-1', 'ring-sky-300');
-      });
-      btn.classList.add('ring-2', 'ring-offset-1', 'ring-sky-300');
-    });
-  });
-
-  updateAll();
-  initOnboarding();
-  console.log('人生时间窗口导航系统已启动');
+  els.focusList.innerHTML = focusItems
+    .map((item) => {
+      const status = getWindowStatus(item, state.age);
+      const meta = CATEGORY_META[item.category] || {};
+      return `
+        <article class="focus-item">
+          ${makeBadge(status)}
+          <h3>${escapeHtml(item.title)}</h3>
+          <p class="focus-meta">
+            <span>${escapeHtml(meta.icon || "•")} ${escapeHtml(meta.label || item.categoryName || "未分类")}</span>
+            <span>锁死 ${item.lockForce}%</span>
+            <span>${item.goldStart}-${item.goldEnd}岁</span>
+          </p>
+          <p>${escapeHtml(clampText(item.desc, 48))}</p>
+          <button class="open-btn" type="button" data-open="${item.id}">查看动作与代价</button>
+        </article>
+      `;
+    })
+    .join("");
 }
 
-document.addEventListener('DOMContentLoaded', initApp);
-
-function initOnboarding() {
-  const steps = [
-    { icon: '👋', title: '欢迎使用人生时间窗口', desc: '40个关键人生窗口，帮你找到每件事的最优时机' },
-    { icon: '🎚️', title: '顶部年龄滑块', desc: '滑块固定在顶部，随时拖动查看不同年龄的窗口状态' },
-    { icon: '📊', title: '三大核心分区', desc: '黄金期(该做的事)、即将关闭(紧急)、即将开启(规划)，点击卡片查看详情' }
-  ];
-  let step = 0;
-  const mask = document.getElementById('onboardingMask');
-  const icon = document.getElementById('onboardingIcon');
-  const title = document.getElementById('onboardingTitle');
-  const desc = document.getElementById('onboardingDesc');
-  const dots = document.querySelectorAll('.onboarding-dot');
-  const nextBtn = document.getElementById('onboardingNext');
-  const skipBtn = document.getElementById('onboardingSkip');
-
-  function close() { mask.classList.add('hidden'); }
-  function update() {
-    icon.textContent = steps[step].icon;
-    title.textContent = steps[step].title;
-    desc.textContent = steps[step].desc;
-    dots.forEach(function(d, i) {
-      d.classList.toggle('bg-sky-500', i === step);
-      d.classList.toggle('bg-gray-200', i !== step);
-    });
-    nextBtn.textContent = step === steps.length - 1 ? '开始使用' : '下一步';
+function renderDense(items) {
+  if (!items.length) {
+    els.denseList.innerHTML = `<p class="empty-state">筛选后无结果，尝试放宽年龄、关键词或移除高锁死限制。</p>`;
+    return;
   }
-  nextBtn.addEventListener('click', function() {
-    if (step < steps.length - 1) { step++; update(); } else { close(); }
-  });
-  skipBtn.addEventListener('click', close);
+
+  els.denseList.innerHTML = items
+    .map((item) => {
+      const status = getWindowStatus(item, state.age);
+      const meta = CATEGORY_META[item.category] || {};
+      const categoryLabel = `${meta.icon || "•"} ${meta.label || item.categoryName || "未分类"}`;
+      const reason = getStatusReason(item, state.age);
+      return `
+        <article class="dense-row">
+          <div class="dense-row-head">
+            ${makeBadge(status)}
+            <span class="chip">${escapeHtml(categoryLabel)}</span>
+            <span class="chip">锁死 ${item.lockForce}%</span>
+          </div>
+          <h3>${escapeHtml(item.title)}</h3>
+          <p>${escapeHtml(clampText(item.desc, 84))}</p>
+          <div class="dense-meta">
+            <span class="chip">黄金期 ${item.goldStart}-${item.goldEnd}岁</span>
+            <span class="chip">关闭 ${item.closeAge}岁</span>
+            <span class="chip">状态 ${STATUS_META[status].label}</span>
+          </div>
+          <p class="detail-note">${escapeHtml(reason)}</p>
+          <div class="row-actions">
+            <button class="open-btn" type="button" data-open="${item.id}">展开详情</button>
+          </div>
+        </article>
+      `;
+    })
+    .join("");
 }
+
+function renderDimension() {
+  const nodes = Object.entries(CATEGORY_META).map(([key, meta]) => {
+    const items = WINDOW_DATA.filter((item) => item.category === key);
+    const active = items.filter((item) => ["gold", "warning", "risk"].includes(getWindowStatus(item, state.age))).length;
+    const close = items.filter((item) => getWindowStatus(item, state.age) === "close").length;
+    const total = items.length || 1;
+    const pressure = Math.round((active / total) * 100);
+    return { meta, key, items: items.length, active, close, pressure };
+  });
+
+  els.dimensionGrid.innerHTML = nodes
+    .sort((a, b) => b.pressure - a.pressure || b.active - a.active)
+    .map(
+      (node) => `
+      <article class="dimension-item">
+        <div class="dimension-top">
+          <p class="dimension-name">${escapeHtml(node.meta.icon)} ${escapeHtml(node.meta.label)}</p>
+          <p class="dimension-rate">${node.active}/${node.items} 活动</p>
+        </div>
+        <div class="dimension-bar"><span style="width:${node.pressure}%"></span></div>
+        <p class="dimension-rate">已闭窗 ${node.close} 项</p>
+      </article>
+    `
+    )
+    .join("");
+}
+
+function openDetail(id) {
+  const item = WINDOW_DATA.find((d) => d.id === id);
+  if (!item) return;
+  const status = getWindowStatus(item, state.age);
+  const category = CATEGORY_META[item.category];
+  const early = Math.max(item.earlyRiskEnd, 0);
+  const warn = Math.max(item.goldEnd - item.goldStart, 0);
+  const risk = Math.max(item.lateRiskEnd - item.goldEnd, 0);
+  const close = Math.max(item.closeAge - item.lateRiskEnd, 0);
+  const total = early + warn + risk + close || 1;
+  const p1 = Math.max((early / total) * 100, 6);
+  const p2 = Math.max((warn / total) * 100, 6);
+  const p3 = Math.max((risk / total) * 100, 6);
+  const p4 = Math.max((close / total) * 100, 6);
+
+  els.detailContent.innerHTML = `
+    <div>
+      <div>${makeBadge(status)} <span class="badge ${status === "gold" ? "gold" : status === "warning" ? "warn" : status === "risk" ? "risk" : status === "early" ? "early" : "close"}">${escapeHtml(category.label)}</span></div>
+      <h2 class="detail-title">${escapeHtml(item.title)}</h2>
+      <p class="detail-copy">${escapeHtml(item.desc)}</p>
+      <div class="detail-grid">
+        <div class="detail-grid-item">
+          <h4>黄金期</h4>
+          <p>${item.goldStart}-${item.goldEnd}岁</p>
+        </div>
+        <div class="detail-grid-item">
+          <h4>风险上限</h4>
+          <p>${item.closeAge}岁</p>
+        </div>
+        <div class="detail-grid-item">
+          <h4>锁死指数</h4>
+          <p>${item.lockForce}%</p>
+        </div>
+        <div class="detail-grid-item">
+          <h4>维度</h4>
+          <p>${escapeHtml(category.label)}</p>
+        </div>
+      </div>
+      <div class="timeline" role="img" aria-label="时间演进分布">
+        <span class="t1" style="width:${p1.toFixed(2)}%"></span>
+        <span class="t2" style="width:${p2.toFixed(2)}%"></span>
+        <span class="t3" style="width:${p3.toFixed(2)}%"></span>
+        <span class="t4" style="width:${p4.toFixed(2)}%"></span>
+      </div>
+      <div class="detail-grid">
+        <div class="detail-grid-item">
+          <h4>提前风险</h4>
+          <p>${item.earlyCost}: ${escapeHtml(item.earlyCostDesc)}</p>
+        </div>
+        <div class="detail-grid-item">
+          <h4>延后风险</h4>
+          <p>${item.lateCost}: ${escapeHtml(item.lateCostDesc)}</p>
+        </div>
+      </div>
+      <div class="detail-actions">
+        <h4>行动清单</h4>
+        <ol>
+          ${item.actionList.map((action) => `<li>${escapeHtml(action)}</li>`).join("")}
+        </ol>
+      </div>
+      <p class="detail-note">依据：${escapeHtml(item.source)}</p>
+    </div>
+  `;
+  els.detailPanel.classList.add("is-open");
+  els.detailPanel.setAttribute("aria-hidden", "false");
+}
+
+function closeDetail() {
+  els.detailPanel.classList.remove("is-open");
+  els.detailPanel.setAttribute("aria-hidden", "true");
+}
+
+function render() {
+  const filtered = sortItems(getFilteredData());
+  const grouped = computeCounts(filtered);
+  els.ageValue.textContent = state.age;
+  els.lifeStage.textContent = getLifeStage(state.age);
+  els.ageSlider.value = String(state.age);
+  els.searchInput.value = state.query;
+  els.categorySelect.value = state.category;
+  els.statusSelect.value = state.status;
+  els.sortSelect.value = state.sort;
+  els.lockOnly.checked = state.lockOnly;
+
+  els.ageChips.forEach((item) => {
+    item.classList.toggle("is-active", Number(item.dataset.age) === state.age);
+  });
+
+  renderKpi(filtered);
+  renderFocus(filtered);
+  renderDense(filtered);
+  renderDimension();
+  els.resultStat.textContent = `共 ${grouped.all} 项 | 现在做 ${grouped.gold} 项 | 已关闭 ${grouped.close} 项`;
+}
+
+function bindEvents() {
+  els.ageSlider.addEventListener("input", (event) => {
+    state.age = Number(event.target.value);
+    render();
+  });
+
+  els.ageChips.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      state.age = Number(btn.dataset.age);
+      render();
+    });
+  });
+
+  els.searchInput.addEventListener("input", (event) => {
+    state.query = event.target.value.trim().toLowerCase();
+    render();
+  });
+
+  els.categorySelect.addEventListener("change", (event) => {
+    state.category = event.target.value;
+    render();
+  });
+
+  els.statusSelect.addEventListener("change", (event) => {
+    state.status = event.target.value;
+    render();
+  });
+
+  els.sortSelect.addEventListener("change", (event) => {
+    state.sort = event.target.value;
+    render();
+  });
+
+  els.lockOnly.addEventListener("change", (event) => {
+    state.lockOnly = event.target.checked;
+    render();
+  });
+
+  els.resetBtn.addEventListener("click", () => {
+    state.age = 30;
+    state.query = "";
+    state.category = "all";
+    state.status = "all";
+    state.sort = "priority";
+    state.lockOnly = false;
+    render();
+  });
+
+  [els.focusList, els.denseList].forEach((root) => {
+    root.addEventListener("click", (event) => {
+      const id = Number(event.target && event.target.getAttribute ? event.target.getAttribute("data-open") : null);
+      if (!id) return;
+      openDetail(id);
+    });
+  });
+
+  els.detailClose.addEventListener("click", closeDetail);
+  els.detailPanel.addEventListener("click", (event) => {
+    if (event.target === els.detailPanel) closeDetail();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeDetail();
+  });
+}
+
+function init() {
+  bindEvents();
+  render();
+}
+
+init();
