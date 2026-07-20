@@ -1,7 +1,7 @@
 # UnyieldingChinese
 
 # 一生要强的中国人模拟器
-
+https://hanxu2018.github.io/UnyieldingChinese/
 ## 完整产品设计方案
 
 ### 一、产品核心定位与底层逻辑
